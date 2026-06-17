@@ -1,0 +1,143 @@
+import { create } from "zustand"
+import { Application } from "../features/types/app";
+import Swal from "sweetalert2"
+import { apiFetch } from "../features/api/api";
+
+interface AppStore {
+    apps: Application[];
+    loading: boolean;
+    error: string | null;
+    isOpen: boolean;
+    appToEdit: Application | null;
+    appToDelete: Application | null;
+    appStatus: Application | null;
+    totalApps: number;
+    modifiedApps:number;
+    activeApps:number;
+    inactiveApps:number;
+    isOpenDelete: boolean;
+    isOpenStatus: boolean;
+
+    fetchApps: () => Promise<void>; 
+    setApps: (apps: Application[]) => void;
+    setIsOpen: (open: boolean) => void;
+    saveApp: (appData: Partial<Application>) => Promise<void>;
+    setAppToEdit: (app: Application | null) => void;
+}
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 4000,
+  background: '#18181b',
+  color: '#ffffff',
+  didOpen: (toast) => {
+    toast.style.border = '1px solid #27272a';
+  }
+});
+
+export const useAppStore = create<AppStore>((set, get) => ({
+  apps: [],
+  loading: false,
+  error: null,
+  isOpen: false,
+  appToEdit: null,
+  appToDelete: null,
+  appStatus:null,
+  totalApps: 0,
+  modifiedApps:0,
+  activeApps: 0,
+  inactiveApps:0,
+  isOpenDelete: false,
+  isOpenStatus:false,
+
+  fetchApps: async () => {
+    try {
+      set({ loading: true, error: null });
+      const apps = await apiFetch('/app');
+      const totalApps = apps.length;
+      console.log("applications===", apps, totalApps)
+
+      const modifiedApps = apps.filter(
+        (app :Application) =>
+          app.updated_at &&
+          app.created_at &&
+          new Date(app.updated_at).getTime() !== new Date(app.created_at).getTime()
+      ).length;
+
+      const activeApps = apps.filter((app :Application) => app.is_active === true).length;
+      const inactiveApps = apps.filter((app :Application) => app.is_active === false).length;
+      set({
+        apps,
+        totalApps,
+        activeApps,
+        modifiedApps,
+        inactiveApps,
+        loading: false,
+      });
+      // console.log("test=====", totalApps,
+      //   modifiedApps,
+      //   activeApps,
+      //   inactiveApps)
+
+    } catch (error: unknown) {
+      set({
+        error: "Erreur lors du chargement",
+        loading: false,
+      });
+    }
+  },
+  setApps: (apps) => set({ apps, totalApps: apps.length }),
+  setIsOpen: (isOpen) => set({ isOpen }),
+  saveApp: async (appData) => {
+    const { appToEdit, apps } = get();
+    try {
+      if (appToEdit) {
+        const id = appToEdit.id 
+        if (!id) {
+          console.error("ID manquant");
+          return;
+        }
+        const mergedData = { ...appToEdit, ...appData };
+        const { id: _, created_at, updated_at, ...cleanData } = mergedData;
+        const updated = await apiFetch(`/app/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(cleanData),
+        });
+        set({
+          apps: apps.map((u) => (u.id === id ? updated : u)),
+          isOpen: false,
+          appToEdit: null,
+        });
+      } else {
+        const response = await apiFetch("/app/insert", {
+          method: "POST",
+          body: JSON.stringify(appData),
+        });
+      console.log("response==========", response)
+
+        if (response.exists) { 
+          Toast.fire({ icon: 'warning', title: response.message });
+          return
+        }
+        const newApp = response.application
+        set({
+          apps: [newApp, ...apps],
+          isOpen: false,
+          totalApps: get().totalApps + 1
+        });
+
+       Toast.fire({ icon: 'success', title: response.message });
+      
+      }
+    } catch (err) {
+      console.log("erreur==========", err)
+      const message = err instanceof Error ? err.message : 'Erreur lors de la sauvegarde';
+      set({ error: message });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
+  setAppToEdit: (app) => set({ appToEdit: app, isOpen: !!app }),
+  }));
+
