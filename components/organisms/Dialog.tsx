@@ -1,6 +1,6 @@
 
 'use client'
-import { useState } from "react"
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -31,17 +31,36 @@ export function AppDialogForm() {
 
   // const [open, setOpen] = useState(false)
   const form = useForm({
-    defaultValues: { name: "", description: "", code: "" },
+    defaultValues: { name: "", description: "", is_active: true },
     onSubmit: async ({ value}) => {
       await saveApp(value)
       setIsOpen(false) 
     }
   })
 
+  useEffect(() => {
+    if (isOpen) {
+      if (appToEdit) {
+        // Si on modifie, on injecte les valeurs de l'application sélectionnée
+        form.reset({
+          name: appToEdit.name || "",
+          description: appToEdit.description || "",
+          is_active: appToEdit.is_active ?? true,
+        });
+      } else {
+        // Si on ajoute, on remet le formulaire à zéro
+        form.reset({ name: "", description: "", is_active: true });
+      }
+    }
+  }, [appToEdit, isOpen, form]);
+
   return (
+    // {/* si appToEdit, affiche ce dialog avec les donnees*/}
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>Ajouter</Button>
+        <Button>
+           Ajouter une application
+        </Button>
       </DialogTrigger>
 
       <DialogContent  className="border-none shadow-none">
@@ -82,20 +101,25 @@ export function AppDialogForm() {
             )}
           /> 
           {/* si appToEdit, affiche ce form */}
+
           <form.Field
-            name="description"
-            children={(field:any) => (
-                <Select>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Statut" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="true">Activer</SelectItem>
-                      <SelectItem value="false">Desactiver</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+            name="is_active"
+            children={(field: any) => (
+              <Select
+                value={String(field.state.value)}
+                // Au changement, on transforme la chaîne "true"/"false" en vrai booléen
+                onValueChange={(value) => field.handleChange(value === "true")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="true">Activer</SelectItem>
+                    <SelectItem value="false">Désactiver</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             )}
           />
           <DialogFooter className="mt-4">

@@ -23,6 +23,7 @@ interface AppStore {
     setIsOpen: (open: boolean) => void;
     saveApp: (appData: Partial<Application>) => Promise<void>;
     setAppToEdit: (app: Application | null) => void;
+    confirmStatus: (app: Application) => Promise<void>;
 }
 
 const Toast = Swal.mixin({
@@ -76,11 +77,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
         inactiveApps,
         loading: false,
       });
-      // console.log("test=====", totalApps,
-      //   modifiedApps,
-      //   activeApps,
-      //   inactiveApps)
-
     } catch (error: unknown) {
       set({
         error: "Erreur lors du chargement",
@@ -94,29 +90,37 @@ export const useAppStore = create<AppStore>((set, get) => ({
     const { appToEdit, apps } = get();
     try {
       if (appToEdit) {
-        const id = appToEdit.id 
+        console.log("appToEdit===", appToEdit)
+        const id = appToEdit._id 
         if (!id) {
           console.error("ID manquant");
           return;
         }
         const mergedData = { ...appToEdit, ...appData };
-        const { id: _, created_at, updated_at, ...cleanData } = mergedData;
-        const updated = await apiFetch(`/app/${id}`, {
+        const { id: _, _id: __, created_at, updated_at, ...cleanData } = mergedData;
+        const response = await apiFetch(`/app/${id}`, {
           method: "PUT",
           body: JSON.stringify(cleanData),
         });
+        if (response.exists) { 
+          Toast.fire({ icon: 'warning', title: response.message });
+          return
+        }
+        console.log("response put======", response)
+
+        const updatedData = response.application || response;
         set({
-          apps: apps.map((u) => (u.id === id ? updated : u)),
+          apps: apps.map((u) => (u._id === id ? updatedData : u)),
           isOpen: false,
           appToEdit: null,
         });
+        Toast.fire({ icon: 'success', title: response.message || 'Application modifiée avec succès' });
       } else {
         const response = await apiFetch("/app/insert", {
           method: "POST",
           body: JSON.stringify(appData),
         });
-      console.log("response==========", response)
-
+        console.log("response==========", response)
         if (response.exists) { 
           Toast.fire({ icon: 'warning', title: response.message });
           return
@@ -127,9 +131,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           isOpen: false,
           totalApps: get().totalApps + 1
         });
-
        Toast.fire({ icon: 'success', title: response.message });
-      
       }
     } catch (err) {
       console.log("erreur==========", err)
@@ -139,5 +141,42 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
   setAppToEdit: (app) => set({ appToEdit: app, isOpen: !!app }),
+
+  confirmStatus: async (app) => {
+  console.log("ON ENTRE")
+  console.log("app===============", app)
+
+
+    const { appStatus, apps  } = get();
+
+  console.log("appStatus===", appStatus, apps)
+
+    const id = app._id;
+    if (!id) return;
+    try {
+        const response = await apiFetch(`/app/${id}`, {
+          method: "PATCH",
+        });
+  console.log("response status change===", response)
+      if (response.exists) { 
+        Toast.fire({ icon: 'warning', title: response.message });
+        return
+      }
+      set({
+        apps: apps.map(u =>
+          u._id === id ? response : u
+        ),
+        isOpenStatus: false,
+        appToEdit: null
+      });
+      Toast.fire({ icon: 'success', title: response.message });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur pendant le changement de statut';
+      set({ error: message });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
+
+  
   }));
 
