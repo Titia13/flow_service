@@ -23,7 +23,7 @@ interface AppStore {
     setIsOpen: (open: boolean) => void;
     saveApp: (appData: Partial<Application>) => Promise<void>;
     setAppToEdit: (app: Application | null) => void;
-    confirmStatus: (app: Application) => Promise<void>;
+    confirmStatus: (app_id: Application['_id']) => Promise<void>;
 }
 
 const Toast = Swal.mixin({
@@ -142,33 +142,40 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
   setAppToEdit: (app) => set({ appToEdit: app, isOpen: !!app }),
 
-  confirmStatus: async (app) => {
+  // Activer/desactiver une application
+  confirmStatus: async (app_id: Application['_id']) => {
   console.log("ON ENTRE")
-  console.log("app===============", app)
+  console.log("app===============", app_id)
 
 
-    const { appStatus, apps  } = get();
+  const { apps  } = get();
 
-  console.log("appStatus===", appStatus, apps)
+  // console.log("appStatus===", appStatus, apps)
 
-    const id = app._id;
-    if (!id) return;
+  //   const id = app._id;
+    if (!app_id) return;
     try {
-        const response = await apiFetch(`/app/${id}`, {
+        const response = await apiFetch(`/app/${app_id}`, {
           method: "PATCH",
         });
-  console.log("response status change===", response)
+        console.log("response status change===", response)
+
+
       if (response.exists) { 
         Toast.fire({ icon: 'warning', title: response.message });
         return
       }
       set({
         apps: apps.map(u =>
-          u._id === id ? response : u
+          u._id === app_id ? response : u,
+        console.log("apps interieur===", apps)
+
         ),
         isOpenStatus: false,
         appToEdit: null
       });
+        console.log("apps===", apps)
+
       Toast.fire({ icon: 'success', title: response.message });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur pendant le changement de statut';

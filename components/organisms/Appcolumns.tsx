@@ -19,13 +19,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useAppStore } from "@/app/store/appStore"
-import { AlertActionExample } from "../Alert"
+import { StatusAlert } from "../Alert"
+import { Badge } from "@/components/ui/badge"
+// import { AlertActionExample } from "../Alert"
 // import { AlertDialogSmall } from "../Alert"
 
 // export const columns: ColumnDef<Application>[] = [ 
 export const getColumns = (
   setAppToEdit: (app: Application) => void,
-  confirmStatus: (app: Application) => Promise<void>
+  confirmStatus: (app_id: Application['_id']) => Promise<void>
 ): ColumnDef<Application>[] => [
     {
       accessorKey: "name",
@@ -39,7 +41,21 @@ export const getColumns = (
     {
       accessorKey: "is_active",
       header: "Statut",
-      cell: ({ row }) => (row.original.is_active ? "Active" : "Inactive"),
+      // cell: ({ row }) => (row.original.is_active ? "Active" : "Inactive"),
+      cell: ({ row }) => {
+        const isActive = row.original.is_active;
+      return (
+      <Badge 
+        className={
+          isActive 
+            ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300" 
+            : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"
+        }
+      >
+        {isActive ? "Active" : "Inactive"}
+      </Badge>
+      )
+      }
     },
     {
       accessorKey: "created_at",
@@ -56,11 +72,11 @@ export const getColumns = (
     {
       header: "Actions",
       id: "actions",
-      accessorKey: "action",
+      // accessorKey: "action",
       enablePinning: true,
       cell: ({ row }) => {
         const data = row.original
-        // console.log("id===", data.id)
+        console.log("data===", data)
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -70,70 +86,20 @@ export const getColumns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setAppToEdit(data)}>
-                <Pencil className="w-4 h-4 text-zinc-400" />
+              <DropdownMenuItem onClick={() => setAppToEdit(data)} className="text-zinc-600 cursor-pointer">
+                <Pencil className="w-4 h-4 text-zinc-600" />
                 Modifier
               </DropdownMenuItem>
 
-              {/* <DropdownMenuItem>
-                {data.is_active ? (
-                  <>
-                    <PowerOff className="w-4 h-4" /> Désactiver
-                  </>
-                ) : (
-                  <>
-                    <Power className="w-4 h-4" /> Activer
-                  </>
-                )}
-                <AlertActionExample /> 
-
-                {/* <Alert
-                  title={data.is_active ? 'Voulez-vous désactiver l\'application' : 'Voulez-vous activer l\'application'}
-                  itemName={`${data.name}`}
-                  onConfirm={async () => {
-                    setAppToChangeStatus(data);
-                    await confirmStatus();
-                  }}
-                  customTrigger={
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()} // Empêche la fermeture du menu
-                      className="focus:bg-white/10 focus:text-white cursor-pointer"
-                    >
-                      {data.is_active ? (
-                        <>
-                          <PowerOff className="w-4 h-4" /> Désactiver
-                        </>
-                      ) : (
-                        <>
-                          <Power className="w-4 h-4" /> Activer
-                        </>
-                      )}
-                    </DropdownMenuItem>
-                  }
-                /> */}
+              {/* <DropdownMenuItem> */}
+                <StatusAlert
+                app={data}
+                title="Confirmer le changement de statut"
+                onConfirm={() => confirmStatus(data._id)}
+                 />
               {/* </DropdownMenuItem> */}
-
-              <DropdownMenuItem
-                onClick={async () => {
-                  await confirmStatus(data)
-                  console.log("Changer le statut de l'application :", data._id);
-                }}
-                className="cursor-pointer"
-              >
-                {data.is_active ? (
-                  <div className="flex items-center gap-2 w-full">
-                    <PowerOff className="w-4 h-4" />
-                    <span>Désactiver</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 w-full">
-                    <Power className="w-4 h-4" />
-                    <span>Activer</span>
-                  </div>
-                )}
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem className="text-destructive cursor-pointer">
                 <Trash2Icon className="w-4 h-4" />
                 Supprimer
               </DropdownMenuItem>
