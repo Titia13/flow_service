@@ -4,10 +4,7 @@ import { Application } from "@/app/features/types/app"
 import { ColumnDef } from "@tanstack/react-table"
 import {
   MoreHorizontal,
-  Trash2Icon,
   Pencil,
-  Power,
-  PowerOff
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,16 +15,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAppStore } from "@/app/store/appStore"
-import { StatusAlert } from "../Alert"
 import { Badge } from "@/components/ui/badge"
-// import { AlertActionExample } from "../Alert"
-// import { AlertDialogSmall } from "../Alert"
+import { StatusAlert } from "../StatusAlert"
+import { DeleteAlert } from "../DeleteAlert"
 
 // export const columns: ColumnDef<Application>[] = [ 
 export const getColumns = (
+  // setDeletedApp: (deleted: boolean) => void,
   setAppToEdit: (app: Application) => void,
-  confirmStatus: (app_id: Application['_id']) => Promise<void>
+  confirmStatus: (app_id: Application['_id']) => Promise<void>,
+  confirmDelete: (app_id: Application['_id']) => Promise<void>
 ): ColumnDef<Application>[] => [
     {
       accessorKey: "name",
@@ -76,7 +73,6 @@ export const getColumns = (
       enablePinning: true,
       cell: ({ row }) => {
         const data = row.original
-        console.log("data===", data)
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -99,10 +95,11 @@ export const getColumns = (
                  />
               {/* </DropdownMenuItem> */}
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive cursor-pointer">
-                <Trash2Icon className="w-4 h-4" />
-                Supprimer
-              </DropdownMenuItem>
+              <DeleteAlert
+                name={data.name}
+                title="Confirmer la suppression"
+                onConfirm={() => confirmDelete(data._id)}
+                 />
             </DropdownMenuContent>
           </DropdownMenu>
         )

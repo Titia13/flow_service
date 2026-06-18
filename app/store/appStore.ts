@@ -4,26 +4,23 @@ import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
 
 interface AppStore {
-    apps: Application[];
-    loading: boolean;
-    error: string | null;
-    isOpen: boolean;
-    appToEdit: Application | null;
-    appToDelete: Application | null;
-    appStatus: Application | null;
-    totalApps: number;
-    modifiedApps:number;
-    activeApps:number;
-    inactiveApps:number;
-    isOpenDelete: boolean;
-    isOpenStatus: boolean;
+  apps: Application[];
+  loading: boolean;
+  error: string | null;
+  isOpen: boolean;
+  appToEdit: Application | null;
+  totalApps: number;
+  modifiedApps: number;
+  activeApps: number;
+  inactiveApps: number;
 
-    fetchApps: () => Promise<void>; 
-    setApps: (apps: Application[]) => void;
-    setIsOpen: (open: boolean) => void;
-    saveApp: (appData: Partial<Application>) => Promise<void>;
-    setAppToEdit: (app: Application | null) => void;
-    confirmStatus: (app_id: Application['_id']) => Promise<void>;
+  fetchApps: () => Promise<void>;
+  setApps: (apps: Application[]) => void;
+  setIsOpen: (open: boolean) => void;
+  saveApp: (appData: Partial<Application>) => Promise<void>;
+  setAppToEdit: (app: Application | null) => void;
+  confirmStatus: (app_id: Application['_id']) => Promise<void>;
+  confirmDelete: (app_id: Application['_id']) => Promise<void>; 
 }
 
 const Toast = Swal.mixin({
@@ -44,14 +41,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
   error: null,
   isOpen: false,
   appToEdit: null,
-  appToDelete: null,
-  appStatus:null,
   totalApps: 0,
-  modifiedApps:0,
+  modifiedApps: 0,
   activeApps: 0,
-  inactiveApps:0,
-  isOpenDelete: false,
-  isOpenStatus:false,
+  inactiveApps: 0,
 
   fetchApps: async () => {
     try {
@@ -61,14 +54,14 @@ export const useAppStore = create<AppStore>((set, get) => ({
       console.log("applications===", apps, totalApps)
 
       const modifiedApps = apps.filter(
-        (app :Application) =>
+        (app: Application) =>
           app.updated_at &&
           app.created_at &&
           new Date(app.updated_at).getTime() !== new Date(app.created_at).getTime()
       ).length;
 
-      const activeApps = apps.filter((app :Application) => app.is_active === true).length;
-      const inactiveApps = apps.filter((app :Application) => app.is_active === false).length;
+      const activeApps = apps.filter((app: Application) => app.is_active === true).length;
+      const inactiveApps = apps.filter((app: Application) => app.is_active === false).length;
       set({
         apps,
         totalApps,
@@ -90,8 +83,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     const { appToEdit, apps } = get();
     try {
       if (appToEdit) {
-        console.log("appToEdit===", appToEdit)
-        const id = appToEdit._id 
+        const id = appToEdit._id
         if (!id) {
           console.error("ID manquant");
           return;
@@ -102,11 +94,10 @@ export const useAppStore = create<AppStore>((set, get) => ({
           method: "PUT",
           body: JSON.stringify(cleanData),
         });
-        if (response.exists) { 
+        if (response.exists) {
           Toast.fire({ icon: 'warning', title: response.message });
           return
         }
-        console.log("response put======", response)
 
         const updatedData = response.application || response;
         set({
@@ -120,8 +111,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
           method: "POST",
           body: JSON.stringify(appData),
         });
-        console.log("response==========", response)
-        if (response.exists) { 
+        if (response.exists) {
           Toast.fire({ icon: 'warning', title: response.message });
           return
         }
@@ -131,52 +121,53 @@ export const useAppStore = create<AppStore>((set, get) => ({
           isOpen: false,
           totalApps: get().totalApps + 1
         });
-       Toast.fire({ icon: 'success', title: response.message });
+        Toast.fire({ icon: 'success', title: response.message });
       }
     } catch (err) {
-      console.log("erreur==========", err)
       const message = err instanceof Error ? err.message : 'Erreur lors de la sauvegarde';
       set({ error: message });
       Toast.fire({ icon: 'error', title: message });
     }
   },
   setAppToEdit: (app) => set({ appToEdit: app, isOpen: !!app }),
-
   // Activer/desactiver une application
   confirmStatus: async (app_id: Application['_id']) => {
-  console.log("ON ENTRE")
-  console.log("app===============", app_id)
-
-
-  const { apps  } = get();
-
-  // console.log("appStatus===", appStatus, apps)
-
-  //   const id = app._id;
+    const { apps } = get();
     if (!app_id) return;
     try {
-        const response = await apiFetch(`/app/${app_id}`, {
-          method: "PATCH",
-        });
-        console.log("response status change===", response)
-
-
-      if (response.exists) { 
+      const response = await apiFetch(`/app/${app_id}`, {
+        method: "PATCH",
+      });
+      if (!response.exists) {
         Toast.fire({ icon: 'warning', title: response.message });
         return
       }
       set({
         apps: apps.map(u =>
-          u._id === app_id ? response : u,
-        console.log("apps interieur===", apps)
-
+          u._id === app_id ? response.application : u,
         ),
-        isOpenStatus: false,
         appToEdit: null
       });
-        console.log("apps===", apps)
-
       Toast.fire({ icon: 'success', title: response.message });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur pendant le changement de statut';
+      set({ error: message });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },  
+  confirmDelete: async (app_id: Application['_id']) => {
+    const {apps} = get();
+    if (!app_id) return;
+    try {
+      const response = await apiFetch(`/app/${app_id}`, {
+        method: "DELETE",
+      });
+      console.log("response===", response)
+      set({ 
+        apps: apps.filter(a => a._id !== response.application._id),
+        // appToDelete: null 
+      });
+      Toast.fire({ icon: 'success', title: response.message || 'Application supprimée avec succès' });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur pendant le changement de statut';
       set({ error: message });
@@ -184,6 +175,5 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
 
-  
-  }));
+}));
 

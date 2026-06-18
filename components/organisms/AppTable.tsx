@@ -6,9 +6,8 @@ import { useEffect, useMemo } from "react";
 import { Application } from "@/app/features/types/app"
 
 export default function AppTable() {
-    const { apps, fetchApps, loading, setAppToEdit, confirmStatus } = useAppStore();
-    // const columns = getColumns(setAppToEdit, confirmStatus)
-    const columns = useMemo(() => getColumns(setAppToEdit, confirmStatus), [confirmStatus]);
+    const { apps, fetchApps, loading, setAppToEdit, confirmStatus, confirmDelete } = useAppStore();
+    const columns = useMemo(() => getColumns(setAppToEdit, confirmStatus, confirmDelete), [confirmStatus, confirmDelete]);
     useEffect(() => {
         fetchApps();
     }, [fetchApps]);

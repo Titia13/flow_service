@@ -85,6 +85,8 @@ export function AppDialogForm() {
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 placeholder="Libelle"
+                type="text"
+                maxLength={30}
                 required 
               />
             )}
@@ -95,33 +97,12 @@ export function AppDialogForm() {
               <Textarea 
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Description" 
+                placeholder="Description"
+                maxLength={500} 
                 required
                 />
             )}
           /> 
-          {/* si appToEdit, affiche ce form */}
-
-          <form.Field
-            name="is_active"
-            children={(field: any) => (
-              <Select
-                value={String(field.state.value)}
-                // Au changement, on transforme la chaîne "true"/"false" en vrai booléen
-                onValueChange={(value) => field.handleChange(value === "true")}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="true">Activer</SelectItem>
-                    <SelectItem value="false">Désactiver</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          />
           <DialogFooter className="mt-4">
             <DialogClose asChild>
               <Button variant="ghost">Annuler</Button>

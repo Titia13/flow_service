@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { console } from "inspector"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

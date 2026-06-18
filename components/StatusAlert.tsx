@@ -9,16 +9,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
 import { DropdownMenuItem } from "./ui/dropdown-menu"
 import { Power, PowerOff } from "lucide-react"
+import { useState } from "react";
 
 
 // je dois creer une interface pour rendre le composant reuitilisable. je vais ajouter des props pour le titre, la description et les actions du dialog
 interface AlertDialogProps {
   app?: {
-    _id?: string | number; 
+    _id?: string | number;
     name?: string
     is_active?: boolean
   }
@@ -28,32 +27,18 @@ interface AlertDialogProps {
   onCancel?: () => void;
 }
 
-export function StatusAlert({ app, title, description, onConfirm, onCancel }: AlertDialogProps) {
-  const [isLoading, setIsLoading] = useState(false)
+export function StatusAlert({ app, title, description, onConfirm }: AlertDialogProps) {
+  const [open, setOpen] = useState(false)
 
-  const handleConfirm1 = async () => {
-      try {
-        setIsLoading(true)
-        await onConfirm()
-        console.log("Statut modifié avec succès pour :", app?._id)
-      } catch (error) {
-        console.error("Erreur lors de la modification du statut :", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    const handleConfirm = async () => {
-        setIsLoading(true)
-        await onConfirm()
-        console.log("Statut modifié avec succès pour :", app?._id)
-    }
+  const handleConfirm = async () => {
+    await onConfirm()
+    setOpen(false)
+  }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        {/* <Button variant="outline">Show Dialog</Button> */}
-      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer text-zinc-600">
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer text-zinc-600">
           {app?.is_active ? (
             <div className="flex items-center gap-2 w-full text-zinc-600">
               <PowerOff className="w-4 h-4" />
@@ -74,20 +59,14 @@ export function StatusAlert({ app, title, description, onConfirm, onCancel }: Al
           <AlertDialogDescription>
             Êtes-vous sûr de vouloir {app?.is_active ? "désactiver" : "activer"}{" "}
             l'application <strong>{app?.name}</strong> ?
-            </AlertDialogDescription>
+          </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel >Annuler</AlertDialogCancel>
+          <AlertDialogCancel>Annuler</AlertDialogCancel>
           <AlertDialogAction
-          onClick={handleConfirm}
-            disabled={isLoading}
-            // className={
-            //   app?.is_active
-            //     ? "bg-amber-600 hover:bg-amber-700 text-white"
-            //     : "bg-emerald-600 hover:bg-emerald-700 text-white"
-            // }
-          >{isLoading ? "Chargement..." : "Confirmer"}
+            onClick={handleConfirm}
+          >{"Confirmer"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
