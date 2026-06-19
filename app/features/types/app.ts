@@ -8,3 +8,14 @@ export interface Application {
     created_at?: Date;
     updated_at?: Date;
 }
+
+export interface Template {
+    id?: number;
+    _id?: number;
+    name?: string;
+    code?: string;
+    description?: string;
+    is_active?: boolean;
+    created_at?: Date;
+    updated_at?: Date;
+}

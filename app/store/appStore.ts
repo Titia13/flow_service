@@ -58,7 +58,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const response = await apiFetch(`/app?${params.toString()}`);
       const apps = response.items || []; 
       const totalApps = response.total;
-      console.log("response fetchApps===", response)
       set({
         apps,
         totalApps,
