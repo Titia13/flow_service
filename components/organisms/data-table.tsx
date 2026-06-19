@@ -55,8 +55,11 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div className="overflow-hidden rounded-md border overflow-x-auto">
-        <Table>
-          <TableHeader>
+        <Table
+          className="shadow-md">
+          <TableHeader
+          className="bg-[#923e0e] text-white [&_tr]:hover:bg-transparent [&_th]:text-white"
+          >
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -64,12 +67,12 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className={isPinned ? "sticky bg-[#fffaf7] left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" : ""}
+                      className={isPinned ? "sticky  left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" : ""}
                       style={{
                         // left: isPinned ? `${header.column.getStart("left")}px` : undefined,
                         left: isPinned === "left" ? `${header.column.getStart("left")}px` : undefined,
                         right: isPinned === "right" ? `${header.column.getAfter("right")}px` : undefined,
-                        // backgroundColor: isPinned ? "#fffaf7" : undefined,
+                        // backgroundColor: isPinned ? "#923e0e" : undefined,
                       }}
                     >
                       {flexRender(header.column.columnDef.header, header.getContext())}
@@ -92,7 +95,7 @@ export function DataTable<TData, TValue>({
                       <TableCell
                         key={cell.id}
                         //  Rendu sticky pour le contenu des cellules
-                        className={isPinned ? "sticky left-0 bg-[#fffaf7] z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" : ""}
+                        className={isPinned ? "sticky left-0 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]" : ""}
                         style={{
                           left: isPinned ? `${cell.column.getStart("left")}px` : undefined,
                           right: isPinned === "right" ? `${cell.column.getAfter("right")}px` : undefined,

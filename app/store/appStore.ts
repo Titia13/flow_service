@@ -14,7 +14,7 @@ interface AppStore {
   itemsPerPage: number;
   currentPage: number;
 
-  fetchApps: (page?: number, size?: number) => Promise<void>;
+  fetchApps: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
   // setApps: (apps: Application[]) => void;
   setIsOpen: (open: boolean) => void;
   saveApp: (appData: Partial<Application>) => Promise<void>;
@@ -45,22 +45,23 @@ export const useAppStore = create<AppStore>((set, get) => ({
   pageCount: 0,
   itemsPerPage: 5,
   currentPage: 1,
+  searchQuery: "",
 
-  fetchApps: async (currentPage, itemsPerPage) => {
+  fetchApps: async (currentPage, itemsPerPage, searchQuery) => {
     try {
       set({ loading: true, error: null });
-      const response = await apiFetch(`/app?page=${currentPage}&size=${itemsPerPage}`);
+       const params = new URLSearchParams({
+      page: String(currentPage),
+      size: String(itemsPerPage),
+    });
+      if (searchQuery) params.set("name", searchQuery);
+      const response = await apiFetch(`/app?${params.toString()}`);
       const apps = response.items || []; 
       const totalApps = response.total;
-      // const pageCount = response.pages;
-      // const itemsPerPage = response.size;
-      // const currentPage = response.page;
+      console.log("response fetchApps===", response)
       set({
         apps,
         totalApps,
-        // pageCount,
-        // itemsPerPage,
-        // currentPage,
         loading: false,
       });
     } catch (error) {
