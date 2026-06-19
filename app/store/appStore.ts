@@ -10,12 +10,12 @@ interface AppStore {
   isOpen: boolean;
   appToEdit: Application | null;
   totalApps: number;
-  modifiedApps: number;
-  activeApps: number;
-  inactiveApps: number;
+  pageCount: number;
+  itemsPerPage: number;
+  currentPage: number;
 
-  fetchApps: () => Promise<void>;
-  setApps: (apps: Application[]) => void;
+  fetchApps: (page?: number, size?: number) => Promise<void>;
+  // setApps: (apps: Application[]) => void;
   setIsOpen: (open: boolean) => void;
   saveApp: (appData: Partial<Application>) => Promise<void>;
   setAppToEdit: (app: Application | null) => void;
@@ -42,43 +42,38 @@ export const useAppStore = create<AppStore>((set, get) => ({
   isOpen: false,
   appToEdit: null,
   totalApps: 0,
-  modifiedApps: 0,
-  activeApps: 0,
-  inactiveApps: 0,
+  pageCount: 0,
+  itemsPerPage: 5,
+  currentPage: 1,
 
-  fetchApps: async () => {
+  fetchApps: async (currentPage, itemsPerPage) => {
     try {
       set({ loading: true, error: null });
-      const apps = await apiFetch('/app');
-      const totalApps = apps.length;
-      console.log("applications===", apps, totalApps)
-
-      const modifiedApps = apps.filter(
-        (app: Application) =>
-          app.updated_at &&
-          app.created_at &&
-          new Date(app.updated_at).getTime() !== new Date(app.created_at).getTime()
-      ).length;
-
-      const activeApps = apps.filter((app: Application) => app.is_active === true).length;
-      const inactiveApps = apps.filter((app: Application) => app.is_active === false).length;
+      const response = await apiFetch(`/app?page=${currentPage}&size=${itemsPerPage}`);
+      const apps = response.items || []; 
+      const totalApps = response.total;
+      // const pageCount = response.pages;
+      // const itemsPerPage = response.size;
+      // const currentPage = response.page;
       set({
         apps,
         totalApps,
-        activeApps,
-        modifiedApps,
-        inactiveApps,
+        // pageCount,
+        // itemsPerPage,
+        // currentPage,
         loading: false,
       });
-    } catch (error: unknown) {
-      set({
-        error: "Erreur lors du chargement",
-        loading: false,
-      });
+    } catch (error) {
+      const message = 'Erreur lors du chargement';
+      set({ error: message });
+      Toast.fire({ icon: 'error', title: message });
     }
   },
-  setApps: (apps) => set({ apps, totalApps: apps.length }),
+
+  // setApps: (apps) => set({ apps, totalApps: apps.length }),
+
   setIsOpen: (isOpen) => set({ isOpen }),
+
   saveApp: async (appData) => {
     const { appToEdit, apps } = get();
     try {
@@ -129,7 +124,9 @@ export const useAppStore = create<AppStore>((set, get) => ({
       Toast.fire({ icon: 'error', title: message });
     }
   },
+
   setAppToEdit: (app) => set({ appToEdit: app, isOpen: !!app }),
+
   // Activer/desactiver une application
   confirmStatus: async (app_id: Application['_id']) => {
     const { apps } = get();
