@@ -16,7 +16,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -53,10 +52,11 @@ export function DialogForm() {
         form.reset({
           filename: templateToEdit.filename || "",
           content: templateToEdit.content || "",
-          application_id: templateToEdit.application_id || "",
+          application_id: typeof templateToEdit.application_id === 'object' 
+          ? templateToEdit.application_id?._id || ""
+          : templateToEdit.application_id || "",
         });
       } else {
-        // Si on ajoute, on remet le formulaire à zéro
         // listApps()
         form.reset({ filename: "", content: "", application_id: "" });
       }

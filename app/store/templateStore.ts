@@ -83,21 +83,24 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
           console.error("ID manquant");
           return;
         }
-        const mergedData = { ...templateToEdit, ...templateData };
+        const mergedData = { ...templateToEdit.application_id, ...templateData };
         console.log("mergedData", mergedData)
+        console.log("templateToEdit", templateToEdit)
+        console.log("templateData===", templateData)
+
         const { id: _, _id: __, created_at, updated_at, ...cleanData } = mergedData;
         const response = await apiFetch(`/templates/${id}`, {
           method: "PUT",
-          body: JSON.stringify(cleanData),
+          body: JSON.stringify(templateToEdit),
         });
         console.log("response====", response)
 
-        if (response.exists) {
+        if (!response.exists) {
           Toast.fire({ icon: 'warning', title: response.message });
           return
         }
+        const updatedData = response.template
 
-        const updatedData = response.application || response;
                 console.log("updatedData====", updatedData)
 
         set({
@@ -145,7 +148,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       });
       console.log("response===", response)
       set({ 
-        templates: templates.filter(a => a._id !== response.application._id),
+        templates: templates.filter(a => a._id !== response.template._id),
       });
       Toast.fire({ icon: 'success', title: response.message || 'Template supprimé avec succès' });
     } catch (err) {

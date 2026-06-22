@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useMemo, useState } from "react";
 import { PaginationState } from "@tanstack/react-table";
-import { DataTable } from "./data-table";
 import { useTemplateStore } from "@/app/store/templateStore";
 import { getColumns } from "./Columns";
+import { DataTable } from "./data-table";
 
 interface Props {
   searchQuery: string;
@@ -33,21 +33,3 @@ export default function Table({ searchQuery }: Props) {
         </div>
     )
 }
-
-
-
- //   const [pagination, setPagination] = useState<PaginationState>({
-  //   pageIndex: currentPage - 1,
-  //   pageSize: itemsPerPage,
-  // });
-
-  //  useEffect(() => {
-  //   setPagination((prev) => ({ ...prev, pageIndex: currentPage - 1 }));
-  // }, [searchQuery]);
-
-  //   useEffect(() => {
-  //       fetchApps(pagination.pageIndex + 1, pagination.pageSize, searchQuery);
-  //   }, [fetchApps, pagination.pageIndex, pagination.pageSize, searchQuery]);
-
-  //   const pageCountMath = Math.ceil(totalApps / pagination.pageSize);
-  //   if (loading) return <div>Chargement...</div>;
