@@ -1,7 +1,7 @@
 'use client'
 
-import AppTable from '@/components/organisms/AppTable'
-import { AppDialogForm } from '@/components/organisms/Dialog'
+import AppTable from '@/components/organisms/Application/Table'
+import { AppDialogForm } from '@/components/organisms/Application/Dialog'
 import { Input } from '@/components/ui/input'
 import { useEffect, useState } from 'react'
 
@@ -35,7 +35,7 @@ export default function Applications() {
             <AppDialogForm />
           </div>
         </div> */}
-        <div className="flex items-center gap-4" style={{ marginBottom: '-3rem' }}>
+        <div className="container mx-auto flex items-center gap-4" style={{ marginBottom: '-3rem' }}>
           <Input
             placeholder="Rechercher par libelle "
             className="w-full max-w-6xl"

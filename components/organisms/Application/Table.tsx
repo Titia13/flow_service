@@ -1,6 +1,6 @@
 'use client'
 import { useAppStore } from "@/app/store/appStore";
-import { getColumns } from "./Appcolumns"
+import { getColumns } from "./Columns"
 import { DataTable } from "./data-table"
 import { useEffect, useMemo, useState } from "react";
 import { PaginationState } from "@tanstack/react-table";

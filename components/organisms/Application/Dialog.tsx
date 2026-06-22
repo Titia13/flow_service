@@ -22,6 +22,7 @@ import {
 import { useForm } from "@tanstack/react-form" 
 import { Textarea } from "@/components/ui/textarea"
 import { useAppStore } from "@/app/store/appStore"
+import { Plus } from "lucide-react";
 
 export function AppDialogForm() {
   const saveApp = useAppStore((state) => state.saveApp);
@@ -59,7 +60,7 @@ export function AppDialogForm() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-           Ajouter une application
+           <Plus />Ajouter une application
         </Button>
       </DialogTrigger>
 

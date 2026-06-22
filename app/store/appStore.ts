@@ -13,8 +13,10 @@ interface AppStore {
   pageCount: number;
   itemsPerPage: number;
   currentPage: number;
+  activeApps:Application[];
 
   fetchApps: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
+  listApps: () => Promise<void>;
   // setApps: (apps: Application[]) => void;
   setIsOpen: (open: boolean) => void;
   saveApp: (appData: Partial<Application>) => Promise<void>;
@@ -46,6 +48,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   itemsPerPage: 5,
   currentPage: 1,
   searchQuery: "",
+  activeApps:[],
 
   fetchApps: async (currentPage, itemsPerPage, searchQuery) => {
     try {
@@ -58,10 +61,26 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const response = await apiFetch(`/app?${params.toString()}`);
       const apps = response.items || []; 
       const totalApps = response.total;
+      console.log('hello', response)
       set({
         apps,
         totalApps,
         loading: false,
+      });
+    } catch (error) {
+      const message = 'Erreur lors du chargement';
+      set({ error: message });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
+
+  listApps: async () => {
+    try {
+      const response = await apiFetch("/app");
+      const apps = response.items || []; 
+      const activeApps = apps.filter((i: { is_active: boolean; }) => i.is_active === true);
+      set({
+        activeApps,
       });
     } catch (error) {
       const message = 'Erreur lors du chargement';

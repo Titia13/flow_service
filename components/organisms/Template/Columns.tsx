@@ -16,43 +16,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { StatusAlert } from "../StatusAlert"
-import { DeleteAlert } from "../DeleteAlert"
+import { StatusAlert } from "@/components/StatusAlert"
+import { DeleteAlert } from "@/components/DeleteAlert"
+import { Template } from "@/app/features/types/template"
 
 // export const columns: ColumnDef<Application>[] = [ 
 export const getColumns = (
-  // setDeletedApp: (deleted: boolean) => void,
-  setAppToEdit: (app: Application) => void,
-  confirmStatus: (app_id: Application['_id']) => Promise<void>,
-  confirmDelete: (app_id: Application['_id']) => Promise<void>
+  setTemplateToEdit: (temp: Template) => void,
+  confirmDelete: (id: Template['_id']) => Promise<void>
 ): ColumnDef<Application>[] => [
     {
-      accessorKey: "name",
-      header: "Libelle",
+      accessorKey: "filename",
+      header: "Nom du template",
       enablePinning: true,
     },
     {
-      accessorKey: "description",
-      header: "Description",
-    },
-    {
-      accessorKey: "is_active",
-      header: "Statut",
-      // cell: ({ row }) => (row.original.is_active ? "Active" : "Inactive"),
-      cell: ({ row }) => {
-        const isActive = row.original.is_active;
-      return (
-      <Badge 
-        className={
-          isActive 
-            ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300" 
-            : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"
-        }
-      >
-        {isActive ? "Active" : "Inactive"}
-      </Badge>
-      )
-      }
+      accessorKey: "application_id.name",
+      header: "Application",
     },
     {
       accessorKey: "created_at",
@@ -82,24 +62,21 @@ export const getColumns = (
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setAppToEdit(data)} className="text-zinc-600 cursor-pointer">
+              <DropdownMenuItem onClick={() => setTemplateToEdit(data)} className="text-zinc-600 cursor-pointer">
                 <Pencil className="w-4 h-4 text-zinc-600" />
                 Modifier
               </DropdownMenuItem>
-
-              {/* <DropdownMenuItem> */}
-                <StatusAlert
+                {/* <StatusAlert
                 app={data}
                 title="Confirmer le changement de statut"
                 onConfirm={() => confirmStatus(data._id)}
-                 />
-              {/* </DropdownMenuItem> */}
+                 />*/}
               <DropdownMenuSeparator />
               <DeleteAlert
                 name={data.name}
                 title="Confirmer la suppression"
                 onConfirm={() => confirmDelete(data._id)}
-                 />
+                 /> 
             </DropdownMenuContent>
           </DropdownMenu>
         )
