@@ -41,28 +41,49 @@ export const getColumns = (
       // cell: ({ row }) => (row.original.is_active ? "Active" : "Inactive"),
       cell: ({ row }) => {
         const isActive = row.original.is_active;
-      return (
-      <Badge 
-        className={
-          isActive 
-            ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300" 
-            : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"
-        }
-      >
-        {isActive ? "Active" : "Inactive"}
-      </Badge>
-      )
+        return (
+          <Badge
+            className={
+              isActive
+                ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
+                : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"
+            }
+          >
+            {isActive ? "Active" : "Inactive"}
+          </Badge>
+        )
       }
     },
     {
       accessorKey: "created_at",
       header: "Date de creation",
-      cell: ({ row }) => (row.original.created_at ? new Date(row.original.created_at).toLocaleDateString('fr-FR') : "Date inconnue"),
+      cell: ({ row }) => {
+        const dateValue = row.original.created_at;
+        if (!dateValue) return "Date inconnue";
+        const newDate = new Date(dateValue)
+        const formatedDate = newDate.toLocaleDateString('fr-FR');
+        const formatedHour = newDate.toLocaleTimeString('fr-FR', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });;
+        return `${formatedDate}, ${formatedHour}`
+      }
     },
     {
       accessorKey: "updated_at",
       header: "Date de modification",
-      cell: ({ row }) => (row.original.updated_at ? new Date(row.original.updated_at).toLocaleDateString('fr-FR') : "Date inconnue"),
+      cell: ({ row }) => {
+        const dateValue = row.original.created_at;
+        if (!dateValue) return "Date inconnue";
+        const newDate = new Date(dateValue)
+        const formatedDate = newDate.toLocaleDateString('fr-FR');
+        const formatedHour = newDate.toLocaleTimeString('fr-FR', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });;
+        return `${formatedDate}, ${formatedHour}`
+      }
+      // cell: ({ row }) => (row.original.updated_at ? new Date(row.original.updated_at).toLocaleDateString('fr-FR') : "Date inconnue"),
     },
 
     // Colonne des actions 
@@ -88,18 +109,18 @@ export const getColumns = (
               </DropdownMenuItem>
 
               {/* <DropdownMenuItem> */}
-                <StatusAlert
+              <StatusAlert
                 app={data}
                 title="Confirmer le changement de statut"
                 onConfirm={() => confirmStatus(data._id)}
-                 />
+              />
               {/* </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               <DeleteAlert
                 name={data.name}
                 title="Confirmer la suppression"
                 onConfirm={() => confirmDelete(data._id)}
-                 />
+              />
             </DropdownMenuContent>
           </DropdownMenu>
         )

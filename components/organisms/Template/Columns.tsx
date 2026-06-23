@@ -19,12 +19,13 @@ import { Badge } from "@/components/ui/badge"
 import { StatusAlert } from "@/components/StatusAlert"
 import { DeleteAlert } from "@/components/DeleteAlert"
 import { Template } from "@/app/features/types/template"
+import { HoverCardSides } from "@/components/atoms/HoverCard"
 
 // export const columns: ColumnDef<Application>[] = [ 
 export const getColumns = (
   setTemplateToEdit: (temp: Template) => void,
   confirmDelete: (id: Template['_id']) => Promise<void>
-): ColumnDef<Application>[] => [
+): ColumnDef<Template>[] => [
     {
       accessorKey: "filename",
       header: "Nom du template",
@@ -37,12 +38,40 @@ export const getColumns = (
     {
       accessorKey: "created_at",
       header: "Date de creation",
-      cell: ({ row }) => (row.original.created_at ? new Date(row.original.created_at).toLocaleDateString('fr-FR') : "Date inconnue"),
+      // cell: ({ row }) => (row.original.created_at ? new Date(row.original.created_at).toLocaleDateString('fr-FR',
+      //   {
+      //   day: '2-digit',
+      //   month: '2-digit',
+      //   year: 'numeric',
+      //   hour: '2-digit',
+      //   minute: '2-digit'
+      // }) : "Date inconnue"),
+      cell: ({ row }) => {
+        const dateValue = row.original.created_at;
+        if (!dateValue) return "Date inconnue";
+        const newDate = new Date(dateValue)
+        const formatedDate = newDate.toLocaleDateString('fr-FR');
+        const formatedHour = newDate.toLocaleTimeString('fr-FR', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });;
+        return `${formatedDate}, ${formatedHour}`
+      }
     },
     {
       accessorKey: "updated_at",
       header: "Date de modification",
-      cell: ({ row }) => (row.original.updated_at ? new Date(row.original.updated_at).toLocaleDateString('fr-FR') : "Date inconnue"),
+      cell: ({ row }) => {
+        const dateValue = row.original.updated_at;
+        if (!dateValue) return "Date inconnue";
+        const newDate = new Date(dateValue)
+        const formatedDate = newDate.toLocaleDateString('fr-FR');
+        const formatedHour = newDate.toLocaleTimeString('fr-FR', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });;
+        return `${formatedDate}, ${formatedHour}`
+      }
     },
 
     // Colonne des actions 
@@ -66,6 +95,7 @@ export const getColumns = (
                 <Pencil className="w-4 h-4 text-zinc-600" />
                 Modifier
               </DropdownMenuItem>
+              {/* <HoverCardSides /> */}
                 {/* <StatusAlert
                 app={data}
                 title="Confirmer le changement de statut"
@@ -73,7 +103,7 @@ export const getColumns = (
                  />*/}
               <DropdownMenuSeparator />
               <DeleteAlert
-                name={data.name}
+                name={data.filename}
                 title="Confirmer la suppression"
                 onConfirm={() => confirmDelete(data._id)}
                  /> 

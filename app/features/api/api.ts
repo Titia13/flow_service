@@ -19,9 +19,9 @@ export const apiFetch = async (endpoint: string, options?: RequestInit) => {
       console.log("response api",response)
 
       const errorData = await response.json().catch(() => ({}));
-      console.log("errorData api",errorData)
+      console.log("errorData===",errorData)
 
-      throw new Error(errorData.detail || `Erreur HTTP: ${response.status}`);
+      throw new Error(errorData.detail || `Erreur : ${errorData.message}`  || `Erreur HTTP: ${response.status}`);
     }
     return response.json();
   };

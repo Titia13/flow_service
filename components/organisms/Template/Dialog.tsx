@@ -25,6 +25,16 @@ import { useTemplateStore } from "@/app/store/templateStore"
 import { useAppStore } from "@/app/store/appStore";
 import { Plus } from "lucide-react";
 
+
+ //     const selectedApp = activeApps.find(app => app._id === value.application_id);
+
+      // if (selectedApp) {
+      //   await save({
+      //     ...value,
+      //     application_id: selectedApp // Pass the object instead of the string
+      //   });
+      //   setIsOpen(false);
+      // }
 export function DialogForm() {
   const save = useTemplateStore((state) => state.saveTemplate);
   const templateToEdit = useTemplateStore((state) => state.templateToEdit);
@@ -38,30 +48,32 @@ export function DialogForm() {
     onSubmit: async ({ value }) => {
       await save(value)
       setIsOpen(false)
+     
     }
   })
 
   useEffect(() => {
-  listApps();
-}, []);
-
+    listApps();
+  }, []);
+console.log("activeApps :", activeApps);
   useEffect(() => {
     if (isOpen) {
       if (templateToEdit) {
-        // Si on modifie, on injecte les valeurs de l'application sélectionnée
         form.reset({
           filename: templateToEdit.filename || "",
           content: templateToEdit.content || "",
-          application_id: typeof templateToEdit.application_id === 'object' 
-          ? templateToEdit.application_id?._id || ""
-          : templateToEdit.application_id || "",
+          application_id: templateToEdit.application_id || "",
+          
         });
+        console.log("templateToEdit.application_id :", templateToEdit.application_id)
+console.log("activeApps _ids :", activeApps.map(a => a._id))
+
       } else {
         // listApps()
         form.reset({ filename: "", content: "", application_id: "" });
       }
     }
-  }, [templateToEdit, isOpen, form]);
+  }, [templateToEdit, isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -86,8 +98,10 @@ export function DialogForm() {
           className="flex flex-col gap-4"
         >
           <form.Field
-            name="application_id" 
-            children={(field) => (
+            name="application_id"
+            children={(field) => {
+              console.log("Valeur actuelle du champ :", field.state.value);
+              return (
               <Select
                 value={field.state.value ?? ""}
                 onValueChange={(value) => field.handleChange(value)}
@@ -104,9 +118,10 @@ export function DialogForm() {
                     ))}
                   </SelectGroup>
                 </SelectContent>
-              </Select>
-            )}
+              </Select>)
+            }}
           />
+
           <form.Field
             name="filename"
             children={(field: any) => (
