@@ -55,19 +55,18 @@ export function DialogForm() {
   useEffect(() => {
     listApps();
   }, []);
-console.log("activeApps :", activeApps);
+// console.log("activeApps :", activeApps);
   useEffect(() => {
     if (isOpen) {
       if (templateToEdit) {
+        // console.log("templateToEdit::::::::", templateToEdit)
+
         form.reset({
           filename: templateToEdit.filename || "",
           content: templateToEdit.content || "",
-          application_id: templateToEdit.application_id || "",
+          application_id: templateToEdit?.application_id || "Horos",
           
         });
-        console.log("templateToEdit.application_id :", templateToEdit.application_id)
-console.log("activeApps _ids :", activeApps.map(a => a._id))
-
       } else {
         // listApps()
         form.reset({ filename: "", content: "", application_id: "" });
@@ -84,7 +83,7 @@ console.log("activeApps _ids :", activeApps.map(a => a._id))
       </DialogTrigger>
 
       <DialogContent className="border-none shadow-none">
-        <DialogHeader>
+        <DialogHeader className="mb-4">
           <DialogTitle>
             {templateToEdit ? "Modifier un template " : "Ajouter un template"}
           </DialogTitle>

@@ -1,6 +1,5 @@
 "use client"
 
-import { Application } from "@/app/features/types/app"
 import { ColumnDef } from "@tanstack/react-table"
 import {
   MoreHorizontal,
@@ -11,20 +10,20 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { StatusAlert } from "@/components/StatusAlert"
 import { DeleteAlert } from "@/components/DeleteAlert"
 import { Template } from "@/app/features/types/template"
 import { HoverCardSides } from "@/components/atoms/HoverCard"
+import { StatusAlert } from "./StatusAlert"
 
 // export const columns: ColumnDef<Application>[] = [ 
 export const getColumns = (
   setTemplateToEdit: (temp: Template) => void,
-  confirmDelete: (id: Template['_id']) => Promise<void>
+  confirmDelete: (id: Template['_id']) => Promise<void>,
+  confirmStatus: (id: Template['_id']) => Promise<void>
 ): ColumnDef<Template>[] => [
     {
       accessorKey: "filename",
@@ -73,6 +72,24 @@ export const getColumns = (
         return `${formatedDate}, ${formatedHour}`
       }
     },
+      {
+      accessorKey: "is_active",
+      header: "Statut",
+      cell: ({ row }) => {
+        const isActive = row.original.is_active;
+        return (
+          <Badge
+            className={
+              isActive
+                ? "bg-green-40 text-green-700"
+                : "bg-red-50 text-red-700"
+            }
+          >
+            {isActive ? "Active" : "Inactive"}
+          </Badge>
+        )
+      }
+    },
 
     // Colonne des actions 
     {
@@ -96,11 +113,11 @@ export const getColumns = (
                 Modifier
               </DropdownMenuItem>
               {/* <HoverCardSides /> */}
-                {/* <StatusAlert
-                app={data}
+                <StatusAlert
+                temp={data}
                 title="Confirmer le changement de statut"
                 onConfirm={() => confirmStatus(data._id)}
-                 />*/}
+                 />
               <DropdownMenuSeparator />
               <DeleteAlert
                 name={data.filename}

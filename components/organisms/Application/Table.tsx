@@ -10,26 +10,27 @@ interface Props {
 }
 
 export default function AppTable({ searchQuery }: Props) {
-    const { apps, fetchApps, totalApps,currentPage,  itemsPerPage, loading, setAppToEdit, confirmStatus, confirmDelete } = useAppStore();
-    const columns = useMemo(() => getColumns(setAppToEdit, confirmStatus, confirmDelete), [confirmStatus, confirmDelete]);
-    const [pagination, setPagination] = useState<PaginationState>({
+  const { apps, fetchApps, totalApps, currentPage, itemsPerPage, loading, setAppToEdit, confirmStatus, confirmDelete } = useAppStore();
+  const columns = useMemo(() => getColumns(setAppToEdit, confirmStatus, confirmDelete), [confirmStatus, confirmDelete]);
+  const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: currentPage - 1,
     pageSize: itemsPerPage,
   });
 
-   useEffect(() => {
+  // Met a jour la page lorsqu'on recherche
+  useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: currentPage - 1 }));
   }, [searchQuery]);
 
-    useEffect(() => {
-        fetchApps(pagination.pageIndex + 1, pagination.pageSize, searchQuery);
-    }, [fetchApps, pagination.pageIndex, pagination.pageSize, searchQuery]);
+  useEffect(() => {
+    fetchApps(pagination.pageIndex + 1, pagination.pageSize, searchQuery);
+  }, [fetchApps, pagination.pageIndex, pagination.pageSize, searchQuery]);
 
-    const pageCountMath = Math.ceil(totalApps / pagination.pageSize);
-    if (loading) return <div>Chargement...</div>;
-    return (
-        <div className="container mx-auto py-6">
-        <DataTable columns={columns} data={apps} pageCount={pageCountMath} pagination={pagination} onPaginationChange={setPagination}/>
-        </div>
-    )
+  const pageCountMath = Math.ceil(totalApps / pagination.pageSize);
+  if (loading) return <div>Chargement...</div>;
+  return (
+    <div className="container mx-auto py-6">
+      <DataTable columns={columns} data={apps} pageCount={pageCountMath} pagination={pagination} onPaginationChange={setPagination} />
+    </div>
+  )
 }

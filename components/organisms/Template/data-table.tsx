@@ -40,7 +40,7 @@ export function DataTable<TData, TValue>({
     columns,
     pageCount,
     state: { pagination },
-    // manualPagination: true,// <-- désactive la pagination locale
+    manualPagination: true,// <-- désactive la pagination locale
     onPaginationChange,
     getCoreRowModel: getCoreRowModel(),
     initialState: {

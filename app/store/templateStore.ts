@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { Template } from "../features/types/template";
+import { Template, TemplateOK } from "../features/types/template";
 import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
 
@@ -26,12 +26,15 @@ interface TemplateStore {
   itemsPerPage: number;
   currentPage: number;
   searchQuery: string;
+  activeTemplates: TemplateOK[],
 
   fetchTemplates: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
+  listTemplates: () => Promise<void>;
   // setTemplates: (templates: Template[]) => void;
   setIsOpen: (open: boolean) => void;
   saveTemplate: (templateData: Partial<Template>) => Promise<void>;
   setTemplateToEdit: (template: Template | null) => void;
+  confirmStatus: (app_id: Template['_id']) => Promise<void>;
   confirmDelete: (id: Template['_id']) => Promise<void>;
 }
 
@@ -46,6 +49,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
   pageCount: 0,
   itemsPerPage: 5,
   currentPage: 1,
+  activeTemplates:[],
   searchQuery: "",
 
   fetchTemplates: async (currentPage, itemsPerPage, searchQuery) => {
@@ -57,13 +61,40 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       });
       if (searchQuery) params.set("filename", searchQuery);
       const response = await apiFetch(`/templates?${params.toString()}`);
-      const templates = response.items;
+      const templates = response.items || [];
       const totalTemplates = response.total;
+      const pageCount = response.pages;
+      const activeTemplates = templates.filter((i: { is_active: boolean; }) => i.is_active === true);
+
+      // const apps = response.items || []; 
+      // const activeApps = apps.filter((i: { is_active: boolean; }) => i.is_active === true);
       console.log("response templates", response)
       set({
         templates,
         totalTemplates,
+        pageCount,
         loading: false,
+        activeTemplates
+      });
+    } catch (error) {
+      const message = 'Erreur lors du chargement';
+      set({ error: message, loading: false });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
+
+   listTemplates: async () => {
+    try {
+      const response = await apiFetch("/templates");
+      const templates = response.items || [];
+      const totalTemplates = response.total;
+      const activeTemplates = templates.filter((i: { is_active: boolean; }) => i.is_active === true);
+
+      // const apps = response.items || []; 
+      // const activeApps = apps.filter((i: { is_active: boolean; }) => i.is_active === true);
+      console.log("response listTemplates", response)
+      set({
+        activeTemplates
       });
     } catch (error) {
       const message = 'Erreur lors du chargement';
@@ -76,78 +107,32 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
   saveTemplate: async (templateData) => {
     const { templateToEdit, templates } = get();
     try {
-      // if (templateToEdit) {
-      //   console.log('templateToEdit=====', templateToEdit)
-      //   const id = templateToEdit._id
-      //   if (!id) {
-      //     console.error("ID manquant");
-      //     return;
-      //   }
-      //   const mergedData = { ...templateToEdit, ...templateData };
-      //   const payloadFirst = { ...templateToEdit, ...templateData, application_id: { ...templateToEdit.application_id, _id: templateData.application_id } };
-      //   const payload = { ...templateToEdit, ...templateData, application_id: { ...templateToEdit.application_id } };
-
-      //   // console.log("application_id////////", payload.application_id)
-      //   // console.log("_id////////", payload._id)
-
-      //   console.log("payload=============", payload)
-      //   console.log("templateData===", templateData)
-
-
-
-      //   // console.log("mergedData", mergedData)
-
-      //   const { id: _, _id: __, created_at, updated_at, is_active, is_deleted, version, ...cleanData } = payload;
-      //   console.log("cleanData ====", cleanData)
-      //   const body = {
-      //     ...cleanData,
-      //     application_id: cleanData.application_id?._id || cleanData.application_id?.id 
-      //   };
-      //   console.log("body ====", body)
-
-      //   const response = await apiFetch(`/templates/${id}`, {
-      //     method: "PUT",
-      //     body: JSON.stringify(body),
-      //   });
-      //   console.log("comment tu vas ??????????????")
-      //   console.log("response====", response)
-
-      //   if (!response.exists) {
-      //     Toast.fire({ icon: 'warning', title: 'Une erreur est survenue' });
-      //     return
-      //   }
-      //   const updatedData = response.template
-
-      //   console.log("updatedData====", updatedData)
-
-      //   set({
-      //     templates: templates.map((u) => (u._id === id ? updatedData : u)),
-      //     isOpen: false,
-      //     templateToEdit: null,
-      //   });
-      //   Toast.fire({ icon: 'success', title: response.message || 'Template modifié avec succès' });
-      // } 
-
       if (templateToEdit) {
-        console.log('templateToEdit=====', templateToEdit)
+        // console.log('templateToEdit=====', templateToEdit)
         const id = templateToEdit._id
         if (!id) {
           console.error("ID manquant");
           return;
         }
+        //   const payloadFirst = { ...templateToEdit, ...templateData, application_id: { ...templateToEdit.application_id, _id: templateData.application_id } };
+        //   const payload = { ...templateToEdit, ...templateData, application_id: { ...templateToEdit.application_id } };
+        //   const { id: _, _id: __, created_at, updated_at, is_active, is_deleted, version, ...cleanData } = payload;
+        //   const body = {
+        //     ...cleanData,
+        //     application_id: cleanData.application_id?._id || cleanData.application_id?.id 
+        //   };
         const mergedData = { ...templateToEdit, ...templateData };
 
         const { id: _, _id: __, created_at, updated_at, is_active, is_deleted, version, engine, type, ...cleanData } = mergedData;
         console.log("cleanData ====", cleanData)
         const body = {
           ...cleanData,
-          application_id: cleanData.application_id 
+          application_id: cleanData.application_id
         };
-        console.log("body ====", body)
-
+        // console.log("body ====", body)
         const response = await apiFetch(`/templates/${id}`, {
           method: "PUT",
-          body: JSON.stringify(body),
+          body: JSON.stringify(mergedData),
         });
         console.log("response====", response)
 
@@ -156,9 +141,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
           return
         }
         const updatedData = response.template
-
         console.log("updatedData====", updatedData)
-
         set({
           templates: templates.map((u) => (u._id === id ? updatedData : u)),
           isOpen: false,
@@ -196,6 +179,33 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
 
   setTemplateToEdit: (template) => set({ templateToEdit: template, isOpen: !!template }),
 
+  confirmStatus: async (id: Template['_id']) => {
+    const { templates } = get();
+    if (!id) return;
+    try {
+      const response = await apiFetch(`/templates/${id}`, {
+        method: "PATCH",
+      });
+      if (!response.exists) {
+        Toast.fire({ icon: 'warning', title: response.message });
+        return
+      }
+      const dataRes = response.result
+      console.log("dataRes===", dataRes)
+      set({
+        templates: templates.map(t =>
+          t._id === id ? dataRes : t,
+        ),
+        templateToEdit: null
+      });
+      Toast.fire({ icon: 'success', title: response.message });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur pendant le changement de statut';
+      set({ error: message });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
+
   confirmDelete: async (id: Template['_id']) => {
     const { templates } = get();
     if (!id) return;
@@ -203,17 +213,18 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       const response = await apiFetch(`/templates/${id}`, {
         method: "DELETE",
       });
-      console.log("response===", response)
+
       set({
-        templates: templates.filter(a => a._id !== response.template._id),
+        templates: templates.filter(a => a._id !== response.temp._id),
       });
       Toast.fire({ icon: 'success', title: response.message || 'Template supprimé avec succès' });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Erreur pendant le changement de statut';
+      const message = err instanceof Error ? err.message : 'Erreur pendant la suppresion';
       set({ error: message });
       Toast.fire({ icon: 'error', title: message });
     }
   },
+
 
 }));
 
@@ -232,28 +243,3 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
 
 
 
-// Activer/desactiver une application
-// confirmStatus: async (app_id: Application['_id']) => {
-//   const { apps } = get();
-//   if (!app_id) return;
-//   try {
-//     const response = await apiFetch(`/app/${app_id}`, {
-//       method: "PATCH",
-//     });
-//     if (!response.exists) {
-//       Toast.fire({ icon: 'warning', title: response.message });
-//       return
-//     }
-//     set({
-//       apps: apps.map(u =>
-//         u._id === app_id ? response.application : u,
-//       ),
-//       appToEdit: null
-//     });
-//     Toast.fire({ icon: 'success', title: response.message });
-//   } catch (err) {
-//     const message = err instanceof Error ? err.message : 'Erreur pendant le changement de statut';
-//     set({ error: message });
-//     Toast.fire({ icon: 'error', title: message });
-//   }
-// },

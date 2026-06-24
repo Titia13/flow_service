@@ -10,26 +10,26 @@ interface Props {
 }
 
 export default function Table({ searchQuery }: Props) {
-    // const { templates, fetchApps, totalApps,currentPage,  itemsPerPage, loading, setAppToEdit, confirmStatus, confirmDelete } = useTemplateStore();
-    const { templates, fetchTemplates, totalTemplates, currentPage,  itemsPerPage, loading, setTemplateToEdit, confirmDelete } = useTemplateStore();
-       const [pagination, setPagination] = useState<PaginationState>({
+  const { templates, fetchTemplates, pageCount, currentPage, itemsPerPage, loading, setTemplateToEdit, confirmDelete, confirmStatus } = useTemplateStore();
+  const columns = useMemo(() => getColumns(setTemplateToEdit, confirmDelete, confirmStatus), [confirmDelete, confirmStatus]);
+
+  const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: currentPage - 1,
     pageSize: itemsPerPage,
   });
 
-   useEffect(() => {
+  useEffect(() => {
     setPagination((prev) => ({ ...prev, pageIndex: currentPage - 1 }));
   }, [searchQuery]);
- 
-     useEffect(() => {
-        fetchTemplates(currentPage, itemsPerPage, searchQuery);
-    }, [fetchTemplates, currentPage, itemsPerPage, searchQuery]);
-  const columns = useMemo(() => getColumns(setTemplateToEdit, confirmDelete), [confirmDelete]);
 
-    const pageCount = Math.ceil(totalTemplates / pagination.pageSize);
-    return (
-        <div className="container mx-auto py-6">
-        <DataTable columns={columns} data={templates} pageCount={pageCount} pagination={pagination} onPaginationChange={setPagination}/>
-        </div>
-    )
+  useEffect(() => {
+    fetchTemplates(pagination.pageIndex + 1, pagination.pageSize, searchQuery);
+  }, [fetchTemplates, pagination.pageIndex, pagination.pageSize, searchQuery]);
+
+  // const pageCount = Math.ceil(totalTemplates / pagination.pageSize);
+  return (
+    <div className="container mx-auto py-6">
+      <DataTable columns={columns} data={templates} pageCount={pageCount} pagination={pagination} onPaginationChange={setPagination} />
+    </div>
+  )
 }

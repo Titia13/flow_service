@@ -28,7 +28,7 @@ export default function Navbar() {
                 "transition-colors duration-200 font-medium px-2 py-1 rounded-md",
                 isActive 
                   ? "text-orange-500" 
-                  : "text-gray-500 hover:text-orange-400 focus-visible:ring-2 focus-visible:ring-orange-400 outline-none" 
+                  : "text-gray-500 hover:text-orange-500 focus-visible:ring-2 focus-visible:ring-orange-500 outline-none" 
               )}
             >
               {item.name}

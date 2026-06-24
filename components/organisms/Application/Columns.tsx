@@ -45,8 +45,8 @@ export const getColumns = (
           <Badge
             className={
               isActive
-                ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300"
-                : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"
+                ? "bg-green-40 text-green-700"
+                : "bg-red-50 text-red-700"
             }
           >
             {isActive ? "Active" : "Inactive"}
