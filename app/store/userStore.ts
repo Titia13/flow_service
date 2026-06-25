@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
-import { User } from "../features/types/user";
+import { Role, User } from "../features/types/user";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -27,7 +27,9 @@ interface UserStore {
   currentPage: number;
   searchQuery: string;
   activeUsers: User[],
+  roles: Role,
 
+  getRoles: () => Promise<void>;
   fetchUsers: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
   listUsers: () => Promise<void>;
   setIsOpen: (open: boolean) => void;
@@ -49,7 +51,21 @@ export const useUserStore = create<UserStore>((set, get) => ({
   currentPage: 1,
   searchQuery: "",
   activeUsers: [],
+  roles: {},
 
+  getRoles: async() => {
+    try {
+      const roles = await apiFetch("/users/roles");
+      console.log("response USERSS", roles)
+      set({
+        roles
+      });
+    } catch (error) {
+       const message = 'Erreur lors de la sauvegarde';
+      set({ error: message, loading: false });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
   fetchUsers: async (currentPage, itemsPerPage, searchQuery) => {
     try {
       set({ loading: true, error: null });

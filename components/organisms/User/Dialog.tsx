@@ -21,58 +21,55 @@ import {
 } from "@/components/ui/select"
 import { useForm } from "@tanstack/react-form"
 import { Textarea } from "@/components/ui/textarea"
-import { useTemplateStore } from "@/app/store/templateStore"
 import { useAppStore } from "@/app/store/appStore";
 import { Plus } from "lucide-react";
+import { useUserStore } from "@/app/store/userStore";
 
 
- //     const selectedApp = activeApps.find(app => app._id === value.application_id);
+//     const selectedApp = activeApps.find(app => app._id === value.application_id);
 
-      // if (selectedApp) {
-      //   await save({
-      //     ...value,
-      //     application_id: selectedApp // Pass the object instead of the string
-      //   });
-      //   setIsOpen(false);
-      // }
+// if (selectedApp) {
+//   await save({
+//     ...value,
+//     application_id: selectedApp // Pass the object instead of the string
+//   });
+//   setIsOpen(false);
+// }
 export function DialogForm() {
-  const save = useTemplateStore((state) => state.saveTemplate);
-  const templateToEdit = useTemplateStore((state) => state.templateToEdit);
-  const isOpen = useTemplateStore((state) => state.isOpen);
-  const setIsOpen = useTemplateStore((state) => state.setIsOpen);
-  const listApps = useAppStore((state) => state.listApps);
-  const activeApps = useAppStore((state) => state.activeApps);
+  const save = useUserStore((state) => state.saveUser);
+  const userToEdit = useUserStore((state) => state.userToEdit);
+  const isOpen = useUserStore((state) => state.isOpen);
+  const setIsOpen = useUserStore((state) => state.setIsOpen);
+  const getRoles = useUserStore((state) => state.getRoles);
+
 
   const form = useForm({
-    defaultValues: { filename: "", content: "", application_id: "" },
+    defaultValues: { name: "", firstname: "", email: "", pwd: "", role: "" },
     onSubmit: async ({ value }) => {
       await save(value)
       setIsOpen(false)
-     
+
     }
   })
-
-  useEffect(() => {
-    listApps();
+ useEffect(() => {
+    getRoles();
   }, []);
-// console.log("activeApps :", activeApps);
   useEffect(() => {
     if (isOpen) {
-      if (templateToEdit) {
-        // console.log("templateToEdit::::::::", templateToEdit)
-
+      if (userToEdit) {
         form.reset({
-          filename: templateToEdit.filename || "",
-          content: templateToEdit.content || "",
-          application_id: templateToEdit?.application_id || "Horos",
-          
+          name: userToEdit.name || "",
+          firstname: userToEdit.firstname || "",
+          email: userToEdit.email || "Horos",
+          role: userToEdit.role || "",
+          pwd: userToEdit.pwd || "",
         });
       } else {
         // listApps()
-        form.reset({ filename: "", content: "", application_id: "" });
+        form.reset({ name: "", firstname: "", email: "", pwd: "", role: "" });
       }
     }
-  }, [templateToEdit, isOpen]);
+  }, [userToEdit, isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -85,7 +82,7 @@ export function DialogForm() {
       <DialogContent className="border-none shadow-none">
         <DialogHeader className="mb-4">
           <DialogTitle>
-            {templateToEdit ? "Modifier un template " : "Ajouter un template"}
+            {userToEdit ? "Modifier un utilisateur " : "Ajouter un utilisateur"}
           </DialogTitle>
         </DialogHeader>
         <form
@@ -97,61 +94,88 @@ export function DialogForm() {
           className="flex flex-col gap-4"
         >
           <form.Field
-            name="application_id"
-            children={(field) => {
-              console.log("Valeur actuelle du champ :", field.state.value);
-              return (
-              <Select
-                value={field.state.value ?? ""}
-                onValueChange={(value) => field.handleChange(value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionnez une application" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {activeApps.map((app) => (
-                      <SelectItem key={app._id} value={app._id}>
-                        {app.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>)
-            }}
-          />
-
-          <form.Field
-            name="filename"
+            name="name"
             children={(field: any) => (
               <input
                 className="w-full border border-input rounded-md px-3 py-2"
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Nom du template"
+                placeholder="Nom"
                 type="text"
-                maxLength={40}
+                maxLength={30}
                 required
               />
             )}
           />
           <form.Field
-            name="content"
+            name="firstname"
             children={(field: any) => (
-              <Textarea
+              <input
+                className="w-full border border-input rounded-md px-3 py-2"
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Contenu"
+                placeholder="Prenom"
+                type="text"
+                maxLength={30}
                 required
               />
             )}
+          />
+          <form.Field
+            name="email"
+            children={(field: any) => (
+              <input
+                className="w-full border border-input rounded-md px-3 py-2"
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Email"
+                type="text"
+                maxLength={30}
+                required
+              />
+            )}
+          />
+          <form.Field
+            name="pwd"
+            children={(field: any) => (
+              <input
+                className="w-full border border-input rounded-md px-3 py-2"
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Mot de passe"
+                type="text"
+                maxLength={30}
+                required
+              />
+            )}
+          />
+          <form.Field
+            name="role"
+            children={(field) => {
+              console.log("Valeur actuelle du champ :", field.state.value);
+              return (
+                <Select
+                  value={field.state.value ?? ""}
+                  onValueChange={(value) => field.handleChange(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sélectionnez une application" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="editor">Editeur</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>)
+            }}
           />
           <DialogFooter className="mt-4">
             <DialogClose asChild>
               <Button variant="ghost">Annuler</Button>
             </DialogClose>
             <Button type="submit">
-              {templateToEdit ? "Modifier" : "Enregistrer"}
+              {userToEdit ? "Modifier" : "Enregistrer"}
             </Button>
           </DialogFooter>
         </form>
