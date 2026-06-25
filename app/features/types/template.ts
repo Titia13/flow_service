@@ -1,4 +1,4 @@
-export interface TemplateOK {
+export interface FileTemplate {
     id?: string;
     _id?: string;
     application_id: App ;

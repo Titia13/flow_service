@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { Template, TemplateOK } from "../features/types/template";
+import { Template, FileTemplate } from "../features/types/template";
 import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
 
@@ -26,7 +26,7 @@ interface TemplateStore {
   itemsPerPage: number;
   currentPage: number;
   searchQuery: string;
-  activeTemplates: TemplateOK[],
+  activeTemplates: FileTemplate[],
 
   fetchTemplates: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
   listTemplates: () => Promise<void>;
@@ -87,12 +87,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
     try {
       const response = await apiFetch("/templates");
       const templates = response.items || [];
-      const totalTemplates = response.total;
       const activeTemplates = templates.filter((i: { is_active: boolean; }) => i.is_active === true);
-
-      // const apps = response.items || []; 
-      // const activeApps = apps.filter((i: { is_active: boolean; }) => i.is_active === true);
-      console.log("response listTemplates", response)
       set({
         activeTemplates
       });
