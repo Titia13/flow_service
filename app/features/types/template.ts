@@ -12,6 +12,11 @@ export interface FileTemplate {
     created_at?: Date;
     updated_at?: Date;
 }
+export interface App {
+    _id: string;
+    id?: string;
+    name?: string;
+}
 
 export interface Template {
     id?: string;
@@ -26,9 +31,4 @@ export interface Template {
     content?: string;
     created_at?: Date;
     updated_at?: Date;
-}
-export interface App {
-    _id: string;
-    id?: string;
-    name?: string;
 }

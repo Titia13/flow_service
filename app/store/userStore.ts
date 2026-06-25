@@ -1,27 +1,7 @@
 import { create } from "zustand"
-import { Application } from "../features/types/app";
 import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
-
-interface UserStore {
-    apps: Application[];
-    loading: boolean;
-    error: string | null;
-    isOpen: boolean;
-    appToEdit: Application | null;
-    appToDelete: Application | null;
-    appStatus: Application | null;
-    totalApps: number;
-    modifiedApps:number;
-    activeApps:number;
-    inactiveApps:number;
-    isOpenDelete: boolean;
-    isOpenStatus: boolean;
-
-    fetchApps: () => Promise<void>; 
-    setApps: (apps: Application[]) => void;
-    setIsOpen: (open: boolean) => void;
-}
+import { User } from "../features/types/user";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -35,160 +15,198 @@ const Toast = Swal.mixin({
   }
 });
 
-export const useAppStore = create<UserStore>((set, get) => ({
-  apps: [],
+interface UserStore {
+  users: User[];
+  loading: boolean;
+  error: string | null;
+  isOpen: boolean;
+  userToEdit: User | null;
+  totalUsers: number;
+  pageCount: number;
+  itemsPerPage: number;
+  currentPage: number;
+  searchQuery: string;
+  activeUsers: User[],
+
+  fetchUsers: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
+  listUsers: () => Promise<void>;
+  setIsOpen: (open: boolean) => void;
+  saveUser: (userData: Partial<User>) => Promise<void>;
+  setUserToEdit: (user: User | null) => void;
+  confirmStatus: (id: User['_id']) => Promise<void>;
+  confirmDelete: (id: User['_id']) => Promise<void>;
+}
+
+export const useUserStore = create<UserStore>((set, get) => ({
+  users: [],
   loading: false,
   error: null,
   isOpen: false,
-  appToEdit: null,
-  appToDelete: null,
-  appStatus:null,
-  totalApps: 0,
-  modifiedApps:0,
-  activeApps: 0,
-  inactiveApps:0,
-  isOpenDelete: false,
-  isOpenStatus:false,
+  userToEdit: null,
+  totalUsers: 0,
+  pageCount: 0,
+  itemsPerPage: 5,
+  currentPage: 1,
+  searchQuery: "",
+  activeUsers: [],
 
-
-  fetchApps: async () => {
+  fetchUsers: async (currentPage, itemsPerPage, searchQuery) => {
     try {
       set({ loading: true, error: null });
-      const users = await apiFetch('/users');
-      const totalUsers = users.length;
-      console.log("USERS", users, totalUsers)
-
-      const modifiedUsers = users.filter(
-        (user: User) =>
-          user.updatedAt &&
-          user.createdAt &&
-          new Date(user.updatedAt).getTime() !== new Date(user.createdAt).getTime()
-      ).length;
-
-      const activeUsers = users.filter((user :User) => user.isActive === true).length;
-      const inactiveUsers = users.filter((user :User) => user.isActive === false).length;
-
+      const params = new URLSearchParams({
+        page: String(currentPage),
+        size: String(itemsPerPage),
+      });
+      if (searchQuery) {
+        params.set("name", searchQuery);
+        params.set("firstname", searchQuery);
+        params.set("email", searchQuery);
+        params.set("role", searchQuery);
+      }
+      const response = await apiFetch(`/users?${params.toString()}`);
+      const users = response.items || [];
+      const totalUsers = response.total;
+      const pageCount = response.pages;
+      console.log("response USERSS", response)
       set({
         users,
         totalUsers,
-        modifiedUsers,
-        activeUsers,
-        inactiveUsers,
-        loading: false,
+        pageCount,
+        loading: false
       });
-      console.log("test", totalUsers,
-        modifiedUsers,
-        activeUsers,
-        inactiveUsers,)
-
-
-    } catch (error: unknown) {
-      set({
-        error: "Erreur lors du chargement des utilisateurs",
-        loading: false,
-      });
+    } catch (error) {
+      const message = 'Erreur lors du chargement';
+      set({ error: message, loading: false });
+      Toast.fire({ icon: 'error', title: message });
     }
   },
-  setApps: (apps) => set({ apps, totalApps: apps.length }),
-    setIsOpen: (isOpen) => set({ isOpen }),
-  }));
+
+  listUsers: async () => {
+    try {
+      const response = await apiFetch("/users");
+      const users = response.items || [];
+      const activeUsers = users.filter((i: { is_active: boolean; }) => i.is_active === true);
+      set({
+        activeUsers
+      });
+    } catch (error) {
+       const message = error instanceof Error ? error.message : 'Erreur lors de la sauvegarde';
+      set({ error: message, loading: false });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
+  setIsOpen: (isOpen) => set({ isOpen }),
+
+  saveUser: async (userData) => {
+    const { userToEdit, users } = get();
+    try {
+      if (userToEdit) {
+        console.log('userToEdit=====', userToEdit)
+        const id = userToEdit._id
+        if (!id) {
+          console.error("ID manquant");
+          return;
+        }
+        const mergedData = { ...userToEdit, ...userData };
+
+        const { id: _, _id: __, created_at, updated_at, is_active, is_deleted, deleted_at, ...cleanData } = mergedData;
+        console.log("cleanData ====", cleanData)
+
+        // console.log("body ====", body)
+        const response = await apiFetch(`/users/${id}`, {
+          method: "PUT",
+          body: JSON.stringify(cleanData),
+        });
+        console.log("response====", response)
+
+        if (!response.exists) {
+          Toast.fire({ icon: 'warning', title: response.message });
+          return
+        }
+        const updatedData = response.user
+        console.log("updatedData====", updatedData)
+        set({
+          users: users.map((u) => (u._id === id ? updatedData : u)),
+          isOpen: false,
+          userToEdit: null,
+        });
+        Toast.fire({ icon: 'success', title: response.message });
+      }
+      else {
+        const response = await apiFetch("/users/insert", {
+          method: "POST",
+          body: JSON.stringify(userData),
+        });
+        console.log("response add ==============", response)
+
+        if (!response.exists) {
+          Toast.fire({ icon: 'warning', title: response.message });
+          return
+        }
+        const newUser = response.user
+        console.log("newUser add ==============", newUser)
+
+        set({
+          users: [newUser, ...users],
+          isOpen: false,
+          totalUsers: get().totalUsers + 1
+        });
+        Toast.fire({ icon: 'success', title: response.message });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur lors de la sauvegarde';
+      set({ error: message, loading: false });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
+
+  setUserToEdit: (user) => set({ userToEdit: user, isOpen: !!user }),
+
+  confirmStatus: async (id: User['_id']) => {
+    const { users } = get();
+    if (!id) return;
+    try {
+      const response = await apiFetch(`/users/${id}`, {
+        method: "PATCH",
+      });
+      if (!response.exists) {
+        Toast.fire({ icon: 'warning', title: response.message });
+        return
+      }
+      const dataRes = response.result
+      console.log("dataRes===", dataRes)
+      set({
+        users: users.map(t =>
+          t._id === id ? dataRes : t,
+        ),
+        userToEdit: null
+      });
+      Toast.fire({ icon: 'success', title: response.message });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur pendant le changement de statut';
+      set({ error: message });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
+
+  confirmDelete: async (id: User['_id']) => {
+    const { users } = get();
+    if (!id) return;
+    try {
+      const response = await apiFetch(`/templates/${id}`, {
+        method: "DELETE",
+      });
+
+      set({
+        users: users.filter(a => a._id !== response.temp._id),
+      });
+      Toast.fire({ icon: 'success', title: response.message || 'Template supprimé avec succès' });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur pendant la suppresion';
+      set({ error: message });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
 
 
-//   saveUser: async (userData) => {
-//     const { userToEdit, users } = get();
-//     try {
-//       if (userToEdit && userToEdit.id) {
-//         const mergedData = { ...userToEdit, ...userData };
-//         const { id, isActive, refreshToken, createdAt, ...cleanData } = mergedData;
-
-//         const updated = await apiFetch(`/users/${id}`, {
-//           method: "PATCH",
-//           body: JSON.stringify(cleanData),
-//         });
-
-//         set({
-//           users: users.map((u) => (u.id === id ? updated : u)),
-//           isOpen: false,
-//           userToEdit: null,
-//         });
-//       } else {
-//         const { id, createdAt, ...newUserData } = userData;
-//         const newUser = await apiFetch("/users", {
-//           method: "POST",
-//           body: JSON.stringify(newUserData),
-//         });
-        
-//         set({
-//           users: [newUser, ...users],
-//           isOpen: false,
-//           totalUsers: get().totalUsers + 1
-//         });
-//       }
-    
-//       Toast.fire({ icon: 'success', title: 'Utilisateur sauvegardé' });
-
-//     } catch (err) {
-//       const message = err instanceof Error ? err.message : 'Erreur lors de la sauvegarde';
-//       set({ error: message });
-      
-//       Toast.fire({ icon: 'error', title: 'Utilisateur non sauvegardé' });
-//     }
-//   },
-
-  // saveUser: (appData: Partial<Application>) => Promise<void>;
-//   setUserToEdit: (user) => set({ userToEdit: user, isOpen: !!user }),
-//   setUserToDelete: (user) => set({ userToDelete: user, isOpenDelete: !!user }),
-//   setUserToChangeStatus: (user) => set({ userStatus: user, isOpenStatus: !!user }),
-
-
-
-//   confirmDelete: async () => {
-//     const { userToDelete, users } = get();
-//     if (!userToDelete?.id) return;
-//     try {
-//       await apiFetch(`/users/${userToDelete.id}`, {
-//         method: "DELETE",
-//       });
-//       set({ 
-//         users: users.filter(u => u.id !== userToDelete.id),
-//         isOpenDelete: false,
-//         userToDelete: null 
-//       });
-//       Toast.fire({ icon: 'success', title: 'Utilisateur supprime' });
-
-//     } catch (err) {
-//       set({ error: 'Erreur lors de la suppression' });
-//       Toast.fire({ icon: 'error', title: 'Erreur lors de la suppression' });
-//     }
-//   },
-
-//   confirmStatus: async () => {
-//     const { userStatus, users } = get();
-//     if (!userStatus?.id) return;
-  
-//     try {
-//       let updatedUser: User;
-//       if (userStatus.isActive) {
-//         updatedUser = await apiFetch(`/users/deactivate/${userStatus.id}`, {
-//           method: "PATCH",
-//         });
-//       } else {
-//         updatedUser = await apiFetch(`/users/activate/${userStatus.id}`, {
-//           method: "PATCH",
-//         });
-//       }
-  
-//       set({
-//         users: users.map(u =>
-//           u.id === userStatus.id ? updatedUser : u
-//         ),
-//         isOpenStatus: false,
-//         userStatus: null
-//       });
-//       Toast.fire({ icon: 'success', title: 'Statut mis a jour' });
-  
-//     } catch (err) {
-//       set({ error: 'Erreur pendant le changement de statut' });
-//       Toast.fire({ icon: 'error', title: 'Erreur pendant le changement de statut' });
-//     }
-//   }
+}));

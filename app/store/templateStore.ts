@@ -65,10 +65,8 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       const totalTemplates = response.total;
       const pageCount = response.pages;
       const activeTemplates = templates.filter((i: { is_active: boolean; }) => i.is_active === true);
-
-      // const apps = response.items || []; 
-      // const activeApps = apps.filter((i: { is_active: boolean; }) => i.is_active === true);
       console.log("response templates", response)
+      
       set({
         templates,
         totalTemplates,

@@ -1,7 +1,7 @@
 'use client'
 
-import AppTable from '@/components/organisms/Application/Table'
-import { AppDialogForm } from '@/components/organisms/Application/Dialog'
+import Table from '@/components/organisms/User/Table'
+import { DialogForm } from '@/components/organisms/User/Dialog'
 import { Input } from '@/components/ui/input'
 import { useEffect, useState } from 'react'
 
@@ -20,20 +20,20 @@ export default function Users() {
     <main className="min-h-screen p-10 pt-24 antialiased" style={{ backgroundColor: '#fffaf7' }}>
       <div className="mx-auto w-full max-w-6xl">
         <div className="mb-8 flex items-center justify-start">
-          <h1 className="text-xl font-semibold">Liste des applications</h1>
+          <h1 className="text-xl font-semibold">Liste des utilisateurs</h1>
         </div>
         <div className="container mx-auto flex items-center gap-4" style={{ marginBottom: '-3rem' }}>
           <Input
-            placeholder="Rechercher par libelle "
+            placeholder="Rechercher ... "
             className="w-full max-w-6xl"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <AppDialogForm />
+          <DialogForm />
         </div>
       </div>
       <div className="mx-auto w-full max-w-6xl border border-white/10 mt-10">
-        <AppTable searchQuery={debouncedSearch} />
+        <Table searchQuery={debouncedSearch} />
       </div>
     </main>
   )
