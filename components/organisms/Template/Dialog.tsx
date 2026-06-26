@@ -26,15 +26,6 @@ import { useAppStore } from "@/app/store/appStore";
 import { Plus } from "lucide-react";
 
 
- //     const selectedApp = activeApps.find(app => app._id === value.application_id);
-
-      // if (selectedApp) {
-      //   await save({
-      //     ...value,
-      //     application_id: selectedApp // Pass the object instead of the string
-      //   });
-      //   setIsOpen(false);
-      // }
 export function DialogForm() {
   const save = useTemplateStore((state) => state.saveTemplate);
   const templateToEdit = useTemplateStore((state) => state.templateToEdit);
@@ -55,12 +46,9 @@ export function DialogForm() {
   useEffect(() => {
     listApps();
   }, []);
-// console.log("activeApps :", activeApps);
   useEffect(() => {
     if (isOpen) {
       if (templateToEdit) {
-        // console.log("templateToEdit::::::::", templateToEdit)
-
         form.reset({
           filename: templateToEdit.filename || "",
           content: templateToEdit.content || "",
@@ -68,7 +56,6 @@ export function DialogForm() {
           
         });
       } else {
-        // listApps()
         form.reset({ filename: "", content: "", application_id: "" });
       }
     }
@@ -82,7 +69,7 @@ export function DialogForm() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="border-none shadow-none">
+      <DialogContent className="border-none shadow-none max-w-md w-full">
         <DialogHeader className="mb-4">
           <DialogTitle>
             {templateToEdit ? "Modifier un template " : "Ajouter un template"}
@@ -139,6 +126,7 @@ export function DialogForm() {
             name="content"
             children={(field: any) => (
               <Textarea
+              className="w-full break-all max-h-40 overflow-y-auto resize-none"
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 placeholder="Contenu"

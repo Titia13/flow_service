@@ -1,6 +1,6 @@
 export interface FileTemplate {
     id?: string;
-    _id?: string;
+    _id: string;
     application_id: App ;
     filename?: string;
     type?: string;
@@ -31,4 +31,14 @@ export interface Template {
     content?: string;
     created_at?: Date;
     updated_at?: Date;
+}
+
+export interface PdfTemplate{
+    application_id: string;
+    filename: string;
+    // meta_data:MetaData;
+}
+export interface MetaData{
+    application_id?: string;
+    filename?: string;
 }

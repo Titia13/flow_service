@@ -1,7 +1,7 @@
 import { create } from "zustand"
-import { Template, FileTemplate } from "../features/types/template";
+import { Template, FileTemplate, PdfTemplate } from "../features/types/template";
 import Swal from "sweetalert2"
-import { apiFetch } from "../features/api/api";
+import { apiFetch, api, base_url } from "../features/api/api";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -27,6 +27,7 @@ interface TemplateStore {
   currentPage: number;
   searchQuery: string;
   activeTemplates: FileTemplate[],
+  result: string | null;
 
   fetchTemplates: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
   listTemplates: () => Promise<void>;
@@ -36,6 +37,8 @@ interface TemplateStore {
   setTemplateToEdit: (template: Template | null) => void;
   confirmStatus: (app_id: Template['_id']) => Promise<void>;
   confirmDelete: (id: Template['_id']) => Promise<void>;
+  uploadFile: (data: PdfTemplate) => Promise<void>;
+
 }
 
 
@@ -49,9 +52,9 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
   pageCount: 0,
   itemsPerPage: 5,
   currentPage: 1,
-  activeTemplates:[],
+  activeTemplates: [],
   searchQuery: "",
-
+  result: "",
   fetchTemplates: async (currentPage, itemsPerPage, searchQuery) => {
     try {
       set({ loading: true, error: null });
@@ -66,7 +69,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       const pageCount = response.pages;
       const activeTemplates = templates.filter((i: { is_active: boolean; }) => i.is_active === true);
       console.log("response templates", response)
-      
+
       set({
         templates,
         totalTemplates,
@@ -81,7 +84,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
     }
   },
 
-   listTemplates: async () => {
+  listTemplates: async () => {
     try {
       const response = await apiFetch("/templates");
       const templates = response.items || [];
@@ -218,6 +221,43 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
     }
   },
 
+  uploadFile: async (data) => {
+    try {
+      set({ loading: true, error: null });
+      const response = await fetch(`${base_url}/templates/pdf`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Erreur HTTP: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+
+      // Récupérer le nom depuis le header Content-Disposition
+      const disposition = response.headers.get("Content-Disposition");
+      const match = disposition?.match(/filename="(.+)"/);
+      a.download = match?.[1] ?? `Document_${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      set({ result: "Super", loading: false });
+    } catch (error) {
+      const message = "Une erreur est survenue ou le contenu du template est invalide";
+      set({ error: message, loading: false });
+      Toast.fire({ icon: "error", title: message });
+    }
+  },
 
 }));
 

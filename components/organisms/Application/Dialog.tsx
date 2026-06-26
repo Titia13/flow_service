@@ -11,14 +11,6 @@ import {
   DialogFooter,
   DialogClose
 } from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { useForm } from "@tanstack/react-form" 
 import { Textarea } from "@/components/ui/textarea"
 import { useAppStore } from "@/app/store/appStore"
@@ -50,13 +42,12 @@ export function AppDialogForm() {
         });
       } else {
         // Si on ajoute, on remet le formulaire à zéro
-        form.reset({ name: "", description: "", is_active: true });
+        form.reset();
       }
     }
-  }, [appToEdit, isOpen, form]);
+  }, [appToEdit, isOpen]);
 
   return (
-    // {/* si appToEdit, affiche ce dialog avec les donnees*/}
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
@@ -64,7 +55,7 @@ export function AppDialogForm() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent  className="border-none shadow-none">
+      <DialogContent className="border-none shadow-none">
         <DialogHeader>
           <DialogTitle>
             {appToEdit ? "Modifier une application " : "Ajouter une application"}
@@ -96,6 +87,7 @@ export function AppDialogForm() {
             name="description"
             children={(field:any) => (
               <Textarea 
+              className="w-full break-all max-h-20 overflow-y-auto resize-none"
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 placeholder="Description"
