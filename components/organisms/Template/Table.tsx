@@ -29,7 +29,7 @@ export default function Table({ searchQuery }: Props) {
   // const pageCount = Math.ceil(totalTemplates / pagination.pageSize);
   return (
     <div className="container mx-auto py-6">
-      <DataTable columns={columns} data={templates} pageCount={pageCount} pagination={pagination} onPaginationChange={setPagination} />
+      <DataTable columns={columns} data={templates} pageCount={pageCount} pagination={pagination} onPaginationChange={setPagination} isLoading={loading} />
     </div>
   )
 }

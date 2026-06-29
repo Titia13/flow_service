@@ -1,4 +1,3 @@
-
 'use client'
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button"
@@ -31,6 +30,7 @@ export function DialogForm() {
   const templateToEdit = useTemplateStore((state) => state.templateToEdit);
   const isOpen = useTemplateStore((state) => state.isOpen);
   const setIsOpen = useTemplateStore((state) => state.setIsOpen);
+  const setTemplateToEdit = useTemplateStore((state) => state.setTemplateToEdit);
   const listApps = useAppStore((state) => state.listApps);
   const activeApps = useAppStore((state) => state.activeApps);
 
@@ -39,7 +39,6 @@ export function DialogForm() {
     onSubmit: async ({ value }) => {
       await save(value)
       setIsOpen(false)
-     
     }
   })
 
@@ -52,19 +51,22 @@ export function DialogForm() {
         form.reset({
           filename: templateToEdit.filename || "",
           content: templateToEdit.content || "",
-          application_id: templateToEdit?.application_id || "Horos",
-          
+          application_id: templateToEdit?.application_id || "",
         });
       } else {
         form.reset({ filename: "", content: "", application_id: "" });
       }
-    }
-  }, [templateToEdit, isOpen]);
+    } else {
+    // je dois reset au moment de la fermeture aussi
+    form.reset({ filename: "", content: "", application_id: "" });
+  }
+  }, [templateToEdit,isOpen]);
+
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button >
           <Plus /> Ajouter
         </Button>
       </DialogTrigger>

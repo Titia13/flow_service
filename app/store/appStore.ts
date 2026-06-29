@@ -78,6 +78,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const response = await apiFetch("/app");
       const apps = response.items || []; 
       const activeApps = apps.filter((i: { is_active: boolean; }) => i.is_active === true);
+      console.log("activeApps", activeApps)
       set({
         activeApps,
       });
@@ -87,10 +88,13 @@ export const useAppStore = create<AppStore>((set, get) => ({
       Toast.fire({ icon: 'error', title: message });
     }
   },
-
   // setApps: (apps) => set({ apps, totalApps: apps.length }),
-
-  setIsOpen: (isOpen) => set({ isOpen }),
+   setIsOpen: (isOpen) => {
+    if (!isOpen) {
+      set({ appToEdit: null }); // reset à la fermeture
+    }
+    set({ isOpen: isOpen });
+  },
 
   saveApp: async (appData) => {
     const { appToEdit, apps } = get();
@@ -111,7 +115,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
           Toast.fire({ icon: 'warning', title: response.message });
           return
         }
-
         const updatedData = response.application || response;
         set({
           apps: apps.map((u) => (u._id === id ? updatedData : u)),

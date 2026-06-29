@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function Table({ searchQuery }: Props) {
-  const { users, fetchUsers, pageCount, currentPage, itemsPerPage, setUserToEdit, confirmDelete, confirmStatus } = useUserStore();
+  const { users, fetchUsers, loading, pageCount, currentPage, itemsPerPage, setUserToEdit, confirmDelete, confirmStatus } = useUserStore();
   const columns = useMemo(() => getColumns(setUserToEdit, confirmDelete, confirmStatus), [confirmDelete, confirmStatus]);
 
   const [pagination, setPagination] = useState<PaginationState>({
@@ -27,7 +27,7 @@ export default function Table({ searchQuery }: Props) {
   }, [fetchUsers, pagination.pageIndex, pagination.pageSize, searchQuery]);
   return (
     <div className="container mx-auto py-6">
-      <DataTable columns={columns} data={users} pageCount={pageCount} pagination={pagination} onPaginationChange={setPagination} />
+      <DataTable columns={columns} data={users} pageCount={pageCount} pagination={pagination} onPaginationChange={setPagination} isLoading={loading}/>
     </div>
   )
 }

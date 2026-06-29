@@ -34,8 +34,8 @@ export interface Template {
 }
 
 export interface PdfTemplate{
-    application_id: string;
-    filename: string;
+    application_id?: string;
+    filename?: string;
     // meta_data:MetaData;
 }
 export interface MetaData{

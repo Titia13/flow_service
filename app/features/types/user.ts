@@ -4,7 +4,7 @@ export interface User {
     name?: string ;
     firstname?: string;
     email?: string;
-    pwd?: string;
+    password?: string;
     role?: string;
     is_active?: boolean;
     is_deleted?: boolean;

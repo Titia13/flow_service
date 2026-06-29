@@ -38,7 +38,6 @@ interface TemplateStore {
   confirmStatus: (app_id: Template['_id']) => Promise<void>;
   confirmDelete: (id: Template['_id']) => Promise<void>;
   uploadFile: (data: PdfTemplate) => Promise<void>;
-
 }
 
 
@@ -68,8 +67,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       const totalTemplates = response.total;
       const pageCount = response.pages;
       const activeTemplates = templates.filter((i: { is_active: boolean; }) => i.is_active === true);
-      console.log("response templates", response)
-
+      // console.log("response templates", response)
       set({
         templates,
         totalTemplates,
@@ -98,46 +96,44 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       Toast.fire({ icon: 'error', title: message });
     }
   },
-  setIsOpen: (isOpen) => set({ isOpen }),
+
+  setIsOpen: (isOpen) => {
+    if (!isOpen) {
+      set({ templateToEdit: null }); // reset à la fermeture
+    }
+    set({ isOpen: isOpen });
+  },
 
   saveTemplate: async (templateData) => {
     const { templateToEdit, templates } = get();
     try {
       if (templateToEdit) {
-        // console.log('templateToEdit=====', templateToEdit)
         const id = templateToEdit._id
         if (!id) {
           console.error("ID manquant");
           return;
         }
-        //   const payloadFirst = { ...templateToEdit, ...templateData, application_id: { ...templateToEdit.application_id, _id: templateData.application_id } };
-        //   const payload = { ...templateToEdit, ...templateData, application_id: { ...templateToEdit.application_id } };
-        //   const { id: _, _id: __, created_at, updated_at, is_active, is_deleted, version, ...cleanData } = payload;
-        //   const body = {
-        //     ...cleanData,
-        //     application_id: cleanData.application_id?._id || cleanData.application_id?.id 
-        //   };
         const mergedData = { ...templateToEdit, ...templateData };
 
         const { id: _, _id: __, created_at, updated_at, is_active, is_deleted, version, engine, type, ...cleanData } = mergedData;
-        console.log("cleanData ====", cleanData)
         const body = {
-          ...cleanData,
-          application_id: cleanData.application_id
+          filename: templateData.filename || templateToEdit.filename,
+          content: templateData.content || templateToEdit.content,
+          application_id: (() => {
+            const appId = templateData.application_id || templateToEdit.application_id;
+            return typeof appId === "object" && appId !== null ? (appId as any)._id : appId;
+          })(),
         };
-        // console.log("body ====", body)
         const response = await apiFetch(`/templates/${id}`, {
           method: "PUT",
-          body: JSON.stringify(mergedData),
+          body: JSON.stringify(body),
         });
         console.log("response====", response)
-
         if (!response.exists) {
           Toast.fire({ icon: 'warning', title: 'Une erreur est survenue' });
           return
         }
         const updatedData = response.template
-        console.log("updatedData====", updatedData)
         set({
           templates: templates.map((u) => (u._id === id ? updatedData : u)),
           isOpen: false,
@@ -150,19 +146,16 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
           method: "POST",
           body: JSON.stringify(templateData),
         });
-        console.log("response add ==============", response)
-
         if (!response.exists) {
           Toast.fire({ icon: 'warning', title: response.message });
           return
         }
         const newTemp = response.template
-        console.log("newTemp add ==============", newTemp)
-
         set({
           templates: [newTemp, ...templates],
           isOpen: false,
-          totalTemplates: get().totalTemplates + 1
+          totalTemplates: get().totalTemplates + 1,
+          templateToEdit: null,
         });
         Toast.fire({ icon: 'success', title: response.message });
       }
@@ -231,7 +224,6 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
         },
         body: JSON.stringify(data),
       });
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.detail || `Erreur HTTP: ${response.status}`);

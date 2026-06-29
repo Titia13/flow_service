@@ -19,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { SkeletonTable } from "@/components/organisms/Application/Skeleton"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -26,6 +27,7 @@ interface DataTableProps<TData, TValue> {
   pageCount: number;
   pagination: PaginationState;
   onPaginationChange: OnChangeFn<PaginationState>;
+  isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -34,6 +36,7 @@ export function DataTable<TData, TValue>({
   pageCount,
   pagination,
   onPaginationChange,
+  isLoading,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -58,7 +61,7 @@ export function DataTable<TData, TValue>({
         <Table
           className="shadow-md">
           <TableHeader
-          className="bg-[#923e0e] text-white [&_tr]:hover:bg-transparent [&_th]:text-white"
+            className="bg-[#923e0e] text-white [&_tr]:hover:bg-transparent [&_th]:text-white"
           >
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -83,7 +86,13 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+                <TableRow>
+                    <TableCell colSpan={columns.length}>
+                      <SkeletonTable columnCount={columns.length} rowCount={5} />
+                    </TableCell>
+                </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

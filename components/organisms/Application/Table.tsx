@@ -27,10 +27,9 @@ export default function AppTable({ searchQuery }: Props) {
   }, [fetchApps, pagination.pageIndex, pagination.pageSize, searchQuery]);
 
   const pageCountMath = Math.ceil(totalApps / pagination.pageSize);
-  if (loading) return <div>Chargement...</div>;
   return (
     <div className="container mx-auto py-6">
-      <DataTable columns={columns} data={apps} pageCount={pageCountMath} pagination={pagination} onPaginationChange={setPagination} />
+      <DataTable columns={columns} data={apps} pageCount={pageCountMath} pagination={pagination} onPaginationChange={setPagination} isLoading={loading}/>
     </div>
   )
 }

@@ -26,15 +26,6 @@ import { Plus } from "lucide-react";
 import { useUserStore } from "@/app/store/userStore";
 
 
-//     const selectedApp = activeApps.find(app => app._id === value.application_id);
-
-// if (selectedApp) {
-//   await save({
-//     ...value,
-//     application_id: selectedApp // Pass the object instead of the string
-//   });
-//   setIsOpen(false);
-// }
 export function DialogForm() {
   const save = useUserStore((state) => state.saveUser);
   const userToEdit = useUserStore((state) => state.userToEdit);
@@ -44,7 +35,7 @@ export function DialogForm() {
 
 
   const form = useForm({
-    defaultValues: { name: "", firstname: "", email: "", pwd: "", role: "" },
+    defaultValues: { name: "", firstname: "", email: "", password: "", role: "" },
     onSubmit: async ({ value }) => {
       await save(value)
       setIsOpen(false)
@@ -62,11 +53,11 @@ export function DialogForm() {
           firstname: userToEdit.firstname || "",
           email: userToEdit.email || "Horos",
           role: userToEdit.role || "",
-          pwd: userToEdit.pwd || "",
+          password: userToEdit.password || "",
         });
       } else {
         // listApps()
-        form.reset({ name: "", firstname: "", email: "", pwd: "", role: "" });
+        form.reset({ name: "", firstname: "", email: "", password: "", role: "" });
       }
     }
   }, [userToEdit, isOpen]);
@@ -136,7 +127,7 @@ export function DialogForm() {
             )}
           />
           <form.Field
-            name="pwd"
+            name="password"
             children={(field: any) => (
               <input
                 className="w-full border border-input rounded-md px-3 py-2"

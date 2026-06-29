@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import {
   MoreHorizontal,
   Pencil,
+  Upload,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,19 +16,19 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { DeleteAlert } from "@/components/DeleteAlert"
-import { Template } from "@/app/features/types/template"
-import { HoverCardSides } from "@/components/atoms/HoverCard"
+import { PdfTemplate, Template } from "@/app/features/types/template"
 import { StatusAlert } from "./StatusAlert"
+import Link from "next/link"
 
-// export const columns: ColumnDef<Application>[] = [ 
 export const getColumns = (
   setTemplateToEdit: (temp: Template) => void,
   confirmDelete: (id: Template['_id']) => Promise<void>,
   confirmStatus: (id: Template['_id']) => Promise<void>
+  // uploadFile: (data: PdfTemplate) => Promise<void>
 ): ColumnDef<Template>[] => [
     {
       accessorKey: "filename",
-      header: "Nom du template",
+      header: "Libelle",
       enablePinning: true,
     },
     {
@@ -37,14 +38,6 @@ export const getColumns = (
     {
       accessorKey: "created_at",
       header: "Date de creation",
-      // cell: ({ row }) => (row.original.created_at ? new Date(row.original.created_at).toLocaleDateString('fr-FR',
-      //   {
-      //   day: '2-digit',
-      //   month: '2-digit',
-      //   year: 'numeric',
-      //   hour: '2-digit',
-      //   minute: '2-digit'
-      // }) : "Date inconnue"),
       cell: ({ row }) => {
         const dateValue = row.original.created_at;
         if (!dateValue) return "Date inconnue";
@@ -72,7 +65,7 @@ export const getColumns = (
         return `${formatedDate}, ${formatedHour}`
       }
     },
-      {
+    {
       accessorKey: "is_active",
       header: "Statut",
       cell: ({ row }) => {
@@ -90,7 +83,6 @@ export const getColumns = (
         )
       }
     },
-
     // Colonne des actions 
     {
       header: "Actions",
@@ -99,6 +91,12 @@ export const getColumns = (
       enablePinning: true,
       cell: ({ row }) => {
         const data = row.original
+        const inactiveTemp = row.original.is_active
+
+        // const dataUpload = { 
+        //   filename: data.filename,
+        //   application_id: data.application_id
+        //  }
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -113,17 +111,25 @@ export const getColumns = (
                 Modifier
               </DropdownMenuItem>
               {/* <HoverCardSides /> */}
-                <StatusAlert
+              <StatusAlert
                 temp={data}
                 title="Confirmer le changement de statut"
                 onConfirm={() => confirmStatus(data._id)}
-                 />
+              />
+              {inactiveTemp && (
+                <DropdownMenuItem asChild className="text-zinc-600 cursor-pointer" >
+                  <Link href="/file" className="flex items-center w-full">
+                    <Upload className="w-4 h-4 text-zinc-600" />
+                    Télécharger
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DeleteAlert
                 name={data.filename}
                 title="Confirmer la suppression"
                 onConfirm={() => confirmDelete(data._id)}
-                 /> 
+              />
             </DropdownMenuContent>
           </DropdownMenu>
         )

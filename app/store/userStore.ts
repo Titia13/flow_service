@@ -56,7 +56,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
   getRoles: async() => {
     try {
       const roles = await apiFetch("/users/roles");
-      console.log("response USERSS", roles)
+      console.log("roles", roles)
       set({
         roles
       });
@@ -75,9 +75,9 @@ export const useUserStore = create<UserStore>((set, get) => ({
       });
       if (searchQuery) {
         params.set("name", searchQuery);
-        params.set("firstname", searchQuery);
-        params.set("email", searchQuery);
-        params.set("role", searchQuery);
+        // params.set("firstname", searchQuery);
+        // params.set("email", searchQuery);
+        // params.set("role", searchQuery);
       }
       const response = await apiFetch(`/users?${params.toString()}`);
       const users = response.items || [];
@@ -124,6 +124,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
           return;
         }
         const mergedData = { ...userToEdit, ...userData };
+        console.log("mergedData ====", mergedData)
 
         const { id: _, _id: __, created_at, updated_at, is_active, is_deleted, deleted_at, ...cleanData } = mergedData;
         console.log("cleanData ====", cleanData)

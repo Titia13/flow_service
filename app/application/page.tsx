@@ -14,7 +14,7 @@ export default function Applications() {
       setDebouncedSearch(searchQuery);
     }, 200);
     return () => clearTimeout(timeout);
-  }, [searchQuery]); 
+  }, [searchQuery]);
 
   return (
     <main className="min-h-screen p-10 pt-24 antialiased" style={{ backgroundColor: '#fffaf7' }}>
