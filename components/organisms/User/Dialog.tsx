@@ -20,8 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useForm } from "@tanstack/react-form"
-import { Textarea } from "@/components/ui/textarea"
-import { useAppStore } from "@/app/store/appStore";
 import { Plus } from "lucide-react";
 import { useUserStore } from "@/app/store/userStore";
 
@@ -33,30 +31,29 @@ export function DialogForm() {
   const setIsOpen = useUserStore((state) => state.setIsOpen);
   const getRoles = useUserStore((state) => state.getRoles);
 
-
   const form = useForm({
     defaultValues: { name: "", firstname: "", email: "", password: "", role: "" },
     onSubmit: async ({ value }) => {
       await save(value)
       setIsOpen(false)
-
     }
   })
+
  useEffect(() => {
     getRoles();
   }, []);
+
   useEffect(() => {
     if (isOpen) {
       if (userToEdit) {
         form.reset({
           name: userToEdit.name || "",
           firstname: userToEdit.firstname || "",
-          email: userToEdit.email || "Horos",
+          email: userToEdit.email || "",
           role: userToEdit.role || "",
           password: userToEdit.password || "",
         });
       } else {
-        // listApps()
         form.reset({ name: "", firstname: "", email: "", password: "", role: "" });
       }
     }
@@ -154,8 +151,8 @@ export function DialogForm() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="editor">Editeur</SelectItem>
+                      <SelectItem value="Admin">Admin</SelectItem>
+                      <SelectItem value="Editeur">Editeur</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>)

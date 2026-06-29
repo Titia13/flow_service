@@ -18,7 +18,8 @@ import { useState } from "react";
 interface AlertDialogProps {
   user?: {
     _id?: string | number;
-    filename?: string;
+    name?: string;
+    firstname?: string;
     is_active?: boolean;
     is_deleted?: boolean ;
   }
@@ -59,7 +60,7 @@ export function StatusAlert({user, title, description, onConfirm }: AlertDialogP
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>
             Êtes-vous sûr de vouloir {user?.is_active ? "désactiver" : "activer"}{" "}
-            l'utilisateur <strong>{user?.filename}</strong> ?
+            <strong>{user?.name}</strong> <strong>{user?.firstname}</strong>?
           </AlertDialogDescription>
         </AlertDialogHeader>
 

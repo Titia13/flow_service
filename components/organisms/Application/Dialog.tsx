@@ -51,7 +51,7 @@ export function AppDialogForm() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-           <Plus />Ajouter une application
+           <Plus />Ajouter
         </Button>
       </DialogTrigger>
 

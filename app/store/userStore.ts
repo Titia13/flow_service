@@ -111,62 +111,56 @@ export const useUserStore = create<UserStore>((set, get) => ({
       Toast.fire({ icon: 'error', title: message });
     }
   },
-  setIsOpen: (isOpen) => set({ isOpen }),
+   setIsOpen: (isOpen) => {
+    if (!isOpen) {
+      set({ userToEdit: null }); // reset à la fermeture
+    }
+    set({ isOpen: isOpen });
+  },
 
   saveUser: async (userData) => {
     const { userToEdit, users } = get();
     try {
       if (userToEdit) {
-        console.log('userToEdit=====', userToEdit)
         const id = userToEdit._id
         if (!id) {
           console.error("ID manquant");
           return;
         }
         const mergedData = { ...userToEdit, ...userData };
-        console.log("mergedData ====", mergedData)
-
         const { id: _, _id: __, created_at, updated_at, is_active, is_deleted, deleted_at, ...cleanData } = mergedData;
-        console.log("cleanData ====", cleanData)
-
-        // console.log("body ====", body)
         const response = await apiFetch(`/users/${id}`, {
           method: "PUT",
           body: JSON.stringify(cleanData),
         });
-        console.log("response====", response)
 
         if (!response.exists) {
           Toast.fire({ icon: 'warning', title: response.message });
           return
         }
         const updatedData = response.user
-        console.log("updatedData====", updatedData)
         set({
           users: users.map((u) => (u._id === id ? updatedData : u)),
           isOpen: false,
           userToEdit: null,
         });
         Toast.fire({ icon: 'success', title: response.message });
-      }
-      else {
-        const response = await apiFetch("/users/insert", {
+      } else {
+        const response = await apiFetch("/users/register", {
           method: "POST",
           body: JSON.stringify(userData),
         });
-        console.log("response add ==============", response)
-
-        if (!response.exists) {
+        if (response.exists) {
           Toast.fire({ icon: 'warning', title: response.message });
           return
         }
-        const newUser = response.user
-        console.log("newUser add ==============", newUser)
 
+        const newUser = response.user
         set({
           users: [newUser, ...users],
           isOpen: false,
-          totalUsers: get().totalUsers + 1
+          totalUsers: get().totalUsers + 1,
+          userToEdit: null,
         });
         Toast.fire({ icon: 'success', title: response.message });
       }
@@ -190,8 +184,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
         Toast.fire({ icon: 'warning', title: response.message });
         return
       }
-      const dataRes = response.result
-      console.log("dataRes===", dataRes)
+      const dataRes = response.user
       set({
         users: users.map(t =>
           t._id === id ? dataRes : t,
@@ -210,14 +203,13 @@ export const useUserStore = create<UserStore>((set, get) => ({
     const { users } = get();
     if (!id) return;
     try {
-      const response = await apiFetch(`/templates/${id}`, {
+      const response = await apiFetch(`/users/${id}`, {
         method: "DELETE",
       });
-
       set({
-        users: users.filter(a => a._id !== response.temp._id),
+        users: users.filter(a => a._id !== response.user._id),
       });
-      Toast.fire({ icon: 'success', title: response.message || 'Template supprimé avec succès' });
+      Toast.fire({ icon: 'success', title: response.message});
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur pendant la suppresion';
       set({ error: message });

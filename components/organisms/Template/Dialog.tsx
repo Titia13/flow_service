@@ -30,7 +30,6 @@ export function DialogForm() {
   const templateToEdit = useTemplateStore((state) => state.templateToEdit);
   const isOpen = useTemplateStore((state) => state.isOpen);
   const setIsOpen = useTemplateStore((state) => state.setIsOpen);
-  const setTemplateToEdit = useTemplateStore((state) => state.setTemplateToEdit);
   const listApps = useAppStore((state) => state.listApps);
   const activeApps = useAppStore((state) => state.activeApps);
 

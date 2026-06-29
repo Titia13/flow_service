@@ -23,15 +23,6 @@ export const getColumns = (
   confirmDelete: (id: User['_id']) => Promise<void>,
   confirmStatus: (id: User['_id']) => Promise<void>
 ): ColumnDef<User>[] => [
-    
-    //   "_id": "6a2fdf40eeaa539200e5b630",
-    //   "name": "BEHOU",
-    //   "firstname": "Laetitia",
-    //   "email": "laety40@gmail.com",
-    //   "role": "admin",
-    //   "is_active": true,
-    //   "created_at": "2026-06-15T11:17:20.295000",
-    //   "updated_at": "2026-06-15T11:17:20.295000"
     {
       accessorKey: "name",
       header: "Nom",
