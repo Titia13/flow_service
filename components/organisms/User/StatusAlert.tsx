@@ -63,7 +63,6 @@ export function StatusAlert({user, title, description, onConfirm }: AlertDialogP
             <strong>{user?.name}</strong> <strong>{user?.firstname}</strong>?
           </AlertDialogDescription>
         </AlertDialogHeader>
-
         <AlertDialogFooter>
           <AlertDialogCancel>Annuler</AlertDialogCancel>
           <AlertDialogAction

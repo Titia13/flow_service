@@ -24,7 +24,7 @@ export default function Users() {
         </div>
         <div className="container mx-auto flex items-center gap-4" style={{ marginBottom: '-3rem' }}>
           <Input
-            placeholder="Rechercher ... "
+            placeholder="Rechercher par le nom "
             className="w-full max-w-6xl"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

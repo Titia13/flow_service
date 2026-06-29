@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/organisms/Navbar";
+// import { usePathname } from 'next/navigation'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,6 +24,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // const pathname = usePathname()
+  // Masquer la Navbar uniquement sur la page '/login'
+  // const isLoginPage = pathname === '/'
   return (
     <html
       lang="en"
@@ -30,6 +34,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Navbar />
+
         {children}
       </body>
     </html>

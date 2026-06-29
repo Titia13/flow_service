@@ -7,7 +7,8 @@ export default function Navbar() {
 
   const pathname = usePathname();
   const links = [
-    {name: 'Dashboard', href: '/'},
+    {name: 'login', href: '/'},
+    {name: 'Dashboard', href: '/home'},
     {name: 'Applications', href: '/application'},
     {name: 'Templates', href: '/template'},
     {name: 'Fichiers', href: '/file'},
@@ -39,3 +40,29 @@ export default function Navbar() {
     </nav>
   );
 }
+
+
+
+
+// function App() {
+//   const { isAuthenticated } = useAuthStore()
+
+//   return (
+//     <BrowserRouter>
+//       <Routes>
+//         <Route 
+//           path="/" 
+//           element={<LoginForm />} 
+//         />
+//         <Route 
+//           path="/home" 
+//           element={isAuthenticated ? <Home /> : <Navigate to="/" />} 
+//         />
+
+//         <Route 
+//           path="/dashboard" 
+//           element={<Dashboard />} 
+//         />
+
+//   </Routes>
+// </BrowserRouter>

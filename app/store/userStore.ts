@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
-import { Role, User } from "../features/types/user";
+import { Role, User, UserLogin } from "../features/types/user";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -28,6 +28,8 @@ interface UserStore {
   searchQuery: string;
   activeUsers: User[],
   roles: Role,
+  connectedUser: string | null,
+  isAuthenticated: boolean,
 
   getRoles: () => Promise<void>;
   fetchUsers: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
@@ -37,6 +39,7 @@ interface UserStore {
   setUserToEdit: (user: User | null) => void;
   confirmStatus: (id: User['_id']) => Promise<void>;
   confirmDelete: (id: User['_id']) => Promise<void>;
+  UserLogin: (data: UserLogin) => Promise<void>;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -52,8 +55,10 @@ export const useUserStore = create<UserStore>((set, get) => ({
   searchQuery: "",
   activeUsers: [],
   roles: {},
+  connectedUser: "",
+  isAuthenticated: false,
 
-  getRoles: async() => {
+  getRoles: async () => {
     try {
       const roles = await apiFetch("/users/roles");
       console.log("roles", roles)
@@ -61,7 +66,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
         roles
       });
     } catch (error) {
-       const message = 'Erreur lors de la sauvegarde';
+      const message = 'Erreur lors de la sauvegarde';
       set({ error: message, loading: false });
       Toast.fire({ icon: 'error', title: message });
     }
@@ -106,12 +111,12 @@ export const useUserStore = create<UserStore>((set, get) => ({
         activeUsers
       });
     } catch (error) {
-       const message = error instanceof Error ? error.message : 'Erreur lors de la sauvegarde';
+      const message = error instanceof Error ? error.message : 'Erreur lors de la sauvegarde';
       set({ error: message, loading: false });
       Toast.fire({ icon: 'error', title: message });
     }
   },
-   setIsOpen: (isOpen) => {
+  setIsOpen: (isOpen) => {
     if (!isOpen) {
       set({ userToEdit: null }); // reset à la fermeture
     }
@@ -209,7 +214,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
       set({
         users: users.filter(a => a._id !== response.user._id),
       });
-      Toast.fire({ icon: 'success', title: response.message});
+      Toast.fire({ icon: 'success', title: response.message });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur pendant la suppresion';
       set({ error: message });
@@ -217,5 +222,29 @@ export const useUserStore = create<UserStore>((set, get) => ({
     }
   },
 
-
+  UserLogin: async (data: UserLogin) => {
+    const { users } = get();
+    try {
+      const response = await apiFetch("/users/login", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+      if (!response.exists) {
+        Toast.fire({ icon: 'warning', title: response.message });
+        return
+      }
+       console.log("UserLogin info", response.user)
+      set({
+        isAuthenticated: true,
+        loading: false,
+        connectedUser: response.message,
+      });
+      Toast.fire({ icon: 'success', title: response.message });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Mot de passe ou email incorrect';
+      set({ error: message,  isAuthenticated: false,
+        loading: false, });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
 }));

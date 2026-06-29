@@ -13,6 +13,11 @@ export interface User {
     deleted_at?: Date;
 }
 
+export interface UserLogin {
+    email?: string;
+    password?: string;
+}
+
 export interface Role {
     admin?: string;
     editor?: string;
