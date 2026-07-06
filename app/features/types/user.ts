@@ -18,6 +18,12 @@ export interface UserLogin {
     password?: string;
 }
 
+export interface UserInfo {
+    name?: string ;
+    firstname?: string;
+    email?: string;
+    role?: string;
+}
 export interface Role {
     admin?: string;
     editor?: string;

@@ -78,7 +78,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const response = await apiFetch("/app");
       const apps = response.items || []; 
       const activeApps = apps.filter((i: { is_active: boolean; }) => i.is_active === true);
-      console.log("activeApps", activeApps)
+      // console.log("activeApps", activeApps)
       set({
         activeApps,
       });

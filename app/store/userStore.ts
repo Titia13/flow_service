@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
-import { Role, User, UserLogin } from "../features/types/user";
+import { Role, User, UserInfo, UserLogin } from "../features/types/user";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -30,6 +30,7 @@ interface UserStore {
   roles: Role,
   connectedUser: string | null,
   isAuthenticated: boolean,
+  infoUser: UserInfo,
 
   getRoles: () => Promise<void>;
   fetchUsers: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
@@ -56,6 +57,12 @@ export const useUserStore = create<UserStore>((set, get) => ({
   activeUsers: [],
   roles: {},
   connectedUser: "",
+  infoUser: {
+    name: "",
+    firstname: "",
+    email: "",
+    role: ""
+  },
   isAuthenticated: false,
 
   getRoles: async () => {
@@ -233,11 +240,13 @@ export const useUserStore = create<UserStore>((set, get) => ({
         Toast.fire({ icon: 'warning', title: response.message });
         return
       }
-       console.log("UserLogin info", response.user)
+      const infoUser = response.user
+       console.log("UserLogin info", infoUser)
       set({
         isAuthenticated: true,
         loading: false,
         connectedUser: response.message,
+        infoUser
       });
       Toast.fire({ icon: 'success', title: response.message });
     } catch (err) {

@@ -1,25 +1,38 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { cn } from "@/lib/utils"; // Utilitaire standard de Shadcn
+import { cn } from "@/lib/utils"; 
+import { useEffect, useState } from 'react';
 
 export default function Navbar() {
-
   const pathname = usePathname();
+  const [userRole, setRole] = useState<string | null>(null); // Initialisez avec null
+useEffect(() => {
+    const savedRole = localStorage.getItem('role');
+    setRole(savedRole);
+  }, []);
+
   const links = [
-    {name: 'login', href: '/'},
-    {name: 'Dashboard', href: '/home'},
-    {name: 'Applications', href: '/application'},
-    {name: 'Templates', href: '/template'},
-    {name: 'Fichiers', href: '/file'},
-    {name: 'Utilisateurs', href: '/user'},
+    { name: 'Dashboard', href: '/home' },
+    { name: 'Applications', href: '/application' },
+    { name: 'Templates', href: '/template' },
+    { name: 'Fichiers', href: '/file' },
+    { name: 'Utilisateurs', href: '/user' },
   ];
+
+  const filteredLinks = links.filter((link) => {
+    if (!userRole) return false;
+    if (userRole === 'Admin') return true; 
+    if (userRole === 'Editeur') return (link.name !== 'Utilisateurs' && link.href !== '/user'); 
+    return false;
+  });
+
   return (
     <nav className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow">
       <div className="font-bold text-2xl tracking-tighter cursor-pointer">Flow</div>
       
       <div className="flex items-center space-x-6">
-        {links.map((item) => {
+        {filteredLinks.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link 
@@ -40,29 +53,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
-
-
-
-// function App() {
-//   const { isAuthenticated } = useAuthStore()
-
-//   return (
-//     <BrowserRouter>
-//       <Routes>
-//         <Route 
-//           path="/" 
-//           element={<LoginForm />} 
-//         />
-//         <Route 
-//           path="/home" 
-//           element={isAuthenticated ? <Home /> : <Navigate to="/" />} 
-//         />
-
-//         <Route 
-//           path="/dashboard" 
-//           element={<Dashboard />} 
-//         />
-
-//   </Routes>
-// </BrowserRouter>
