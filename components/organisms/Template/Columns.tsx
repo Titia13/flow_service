@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { DeleteAlert } from "@/components/DeleteAlert"
+import { DeleteAlert } from "@/components/atoms/DeleteAlert"
 import { PdfTemplate, Template } from "@/app/features/types/template"
 import { StatusAlert } from "./StatusAlert"
 import Link from "next/link"

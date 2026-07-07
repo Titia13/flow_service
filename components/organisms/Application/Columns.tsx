@@ -16,8 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { StatusAlert } from "@/components/StatusAlert"
-import { DeleteAlert } from "@/components/DeleteAlert"
+import { StatusAlert } from "@/components/atoms/StatusAlert"
+import { DeleteAlert } from "@/components/atoms/DeleteAlert"
 
 // export const columns: ColumnDef<Application>[] = [ 
 export const getColumns = (

@@ -7,7 +7,7 @@ import { Form } from "@/components/organisms/file/Form";
 export default function File() {
 
     return (
-        <main className="min-h-screen bg-[#fffaf7] p-6 pt-24 antialiased">
+        <>
             <div className="mx-auto w-full max-w-4xl">
                 <div className="mb-10 text-center space-y-4">
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900">Téléchargement de fichiers</h1>
@@ -23,6 +23,6 @@ export default function File() {
                     <Form />
                 </div>
             </div>
-        </main>
+        </>
     )
 }

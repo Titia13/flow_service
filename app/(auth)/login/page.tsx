@@ -19,6 +19,7 @@ function LoginForm() {
 
   useEffect(() => {
     if (isAuthenticated) {
+      localStorage.setItem('user', JSON.stringify(infoUser)); 
       localStorage.setItem('role', infoUser.role || ''); 
       router.push('/home')
     }
@@ -34,7 +35,7 @@ function LoginForm() {
               <div className="text-center">
                 <img src="/auth.svg" alt="Auth illustration" className="w-72 mx-auto mb-6" />
                 <h2 className="text-3xl font-bold text-white mb-3">Bienvenue sur Flow</h2>
-                <p className="" style={{ color: '#bd4a07' }}>Connectez-vous pour accéder à votre espace</p>
+                <p className="text-gray-400" >Connectez-vous pour accéder à votre espace</p>
               </div>
             </div>
 
@@ -43,7 +44,7 @@ function LoginForm() {
               <p className="text-gray-500 mb-8">Accédez à votre espace sécurisé</p>
 
               {error && (
-                <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
                   {error}
                 </div>
               )}

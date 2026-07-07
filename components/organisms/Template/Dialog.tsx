@@ -94,13 +94,16 @@ export function DialogForm() {
                 onValueChange={(value) => field.handleChange(value)}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionnez une application" />
+                  <SelectValue placeholder="Sélectionnez une application">
+                  {activeApps.find((app) => app._id === field.state.value)?.name}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     {activeApps.map((app) => (
                       <SelectItem key={app._id} value={app._id}>
-                        {app.name}
+                        {app.name} ??
+                        {app._id === (field.state.value) ? " (Sélectionné)" : "" }
                       </SelectItem>
                     ))}
                   </SelectGroup>

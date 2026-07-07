@@ -9,27 +9,27 @@ import { useRouter } from 'next/navigation';
 
 
 export default function Users() {
-     const infoUser = useUserStore((state) => state.infoUser);
+  const infoUser = useUserStore((state) => state.infoUser);
   const router = useRouter();
-      useEffect(() => {
+  useEffect(() => {
     if (infoUser?.role !== 'Admin') {
-    router.push('/unauthorized');
-  }
+      router.push('/unauthorized');
+    }
   }, [infoUser, router]);
 
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  useEffect(() => { 
+  useEffect(() => {
     const timeout = setTimeout(() => {
       setDebouncedSearch(searchQuery);
     }, 200);
     return () => clearTimeout(timeout);
-  }, [searchQuery]); 
+  }, [searchQuery]);
 
   return (
-    <main className="min-h-screen p-10 pt-24 antialiased" style={{ backgroundColor: '#fffaf7' }}>
+    <>
       <div className="mx-auto w-full max-w-6xl">
         <div className="mb-8 flex items-center justify-start">
           <h1 className="text-xl font-semibold">Liste des utilisateurs</h1>
@@ -47,7 +47,7 @@ export default function Users() {
       <div className="mx-auto w-full max-w-6xl border border-white/10 mt-10">
         <Table searchQuery={debouncedSearch} />
       </div>
-    </main>
+    </>
   )
 }
 

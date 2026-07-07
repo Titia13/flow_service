@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { DeleteAlert } from "@/components/DeleteAlert"
+import { DeleteAlert } from "@/components/atoms/DeleteAlert"
 import { StatusAlert } from "./StatusAlert"
 import { User } from "@/app/features/types/user"
 

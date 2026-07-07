@@ -41,6 +41,7 @@ interface UserStore {
   confirmStatus: (id: User['_id']) => Promise<void>;
   confirmDelete: (id: User['_id']) => Promise<void>;
   UserLogin: (data: UserLogin) => Promise<void>;
+  UserLogout: () => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -241,7 +242,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
         return
       }
       const infoUser = response.user
-       console.log("UserLogin info", infoUser)
+      console.log("UserLogin info", infoUser)
       set({
         isAuthenticated: true,
         loading: false,
@@ -251,9 +252,17 @@ export const useUserStore = create<UserStore>((set, get) => ({
       Toast.fire({ icon: 'success', title: response.message });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Mot de passe ou email incorrect';
-      set({ error: message,  isAuthenticated: false,
-        loading: false, });
+      set({
+        error: message, isAuthenticated: false,
+        loading: false,
+      });
       Toast.fire({ icon: 'error', title: message });
     }
+  },
+
+  UserLogout: () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
+    window.location.href = '/login';
   },
 }));

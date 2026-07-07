@@ -23,6 +23,7 @@ export interface Template {
     _id?: string;
     application_id?: string ;
     filename?: string;
+    name?: string;
     type?: string;
     engine?: string;
     is_active?: boolean;

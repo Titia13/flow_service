@@ -19,7 +19,7 @@ export default function Layout({
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar /> 
-      <main className="flex-1 p-6">
+      <main className="min-h-screen p-10 pt-24 antialiased" style={{ backgroundColor: '#fffaf7' }}>
         {children}
       </main>
     </div>

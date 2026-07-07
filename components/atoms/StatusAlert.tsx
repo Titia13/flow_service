@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { DropdownMenuItem } from "./ui/dropdown-menu"
+import { DropdownMenuItem } from "../ui/dropdown-menu"
 import { Power, PowerOff } from "lucide-react"
 import { useState } from "react";
 
