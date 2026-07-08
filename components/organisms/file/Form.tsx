@@ -34,7 +34,6 @@ export function Form() {
     if (!selectedAppId || !selectedTemplateId) return;
 
     const selectedTemplate = filteredTemplates.find(t => t._id === selectedTemplateId);
-    //  console.log("selectedTemplate;;;;:", selectedTemplate);
     if (!selectedTemplate?.filename) return;
     await uploadFile({
       application_id: selectedAppId,

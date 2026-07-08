@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import { Template, FileTemplate, PdfTemplate } from "../features/types/template";
 import Swal from "sweetalert2"
-import { apiFetch, api, base_url } from "../features/api/api";
+import { apiFetch, base_url } from "../features/api/api";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -67,7 +67,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       const totalTemplates = response.total;
       const pageCount = response.pages;
       const activeTemplates = templates.filter((i: { is_active: boolean; }) => i.is_active === true);
-      // console.log("response templates", response)
+
       set({
         templates,
         totalTemplates,
@@ -110,7 +110,6 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       if (templateToEdit) {
         const id = templateToEdit._id
         if (!id) {
-          console.error("ID manquant");
           return;
         }
         const mergedData = { ...templateToEdit, ...templateData };
@@ -128,7 +127,6 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
           method: "PUT",
           body: JSON.stringify(body),
         });
-        console.log("response====", response)
         if (!response.exists) {
           Toast.fire({ icon: 'warning', title: 'Une erreur est survenue' });
           return
@@ -180,7 +178,6 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
         return
       }
       const dataRes = response.result
-      console.log("dataRes===", dataRes)
       set({
         templates: templates.map(t =>
           t._id === id ? dataRes : t,

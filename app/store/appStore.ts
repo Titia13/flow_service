@@ -78,7 +78,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const response = await apiFetch("/app");
       const apps = response.items || []; 
       const activeApps = apps.filter((i: { is_active: boolean; }) => i.is_active === true);
-      // console.log("activeApps", activeApps)
       set({
         activeApps,
       });
@@ -180,7 +179,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
       const response = await apiFetch(`/app/${app_id}`, {
         method: "DELETE",
       });
-      console.log("response===", response)
       set({ 
         apps: apps.filter(a => a._id !== response.application._id),
         // appToDelete: null 

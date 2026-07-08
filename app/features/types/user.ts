@@ -28,3 +28,10 @@ export interface Role {
     admin?: string;
     editor?: string;
 }
+
+export interface Stats {
+    total: number;
+    active: number;
+    inactive: number;
+    modifiedUsers: number;
+}

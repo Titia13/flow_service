@@ -12,11 +12,11 @@ export default function Users() {
   const infoUser = useUserStore((state) => state.infoUser);
   const router = useRouter();
   useEffect(() => {
-    if (infoUser?.role !== 'Admin') {
+    const userRole = localStorage.getItem('role');
+    if (userRole !== 'Admin') {
       router.push('/unauthorized');
     }
   }, [infoUser, router]);
-
 
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");

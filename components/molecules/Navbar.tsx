@@ -60,10 +60,10 @@ export default function Navbar() {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
           <div
-            className="w-9 h-9 rounded-full flex items-center justify-center shadow-sm shadow-teal-900/20 ring-2 ring-white/20 flex-shrink-0"
+            className="w-8 h-8 rounded-full flex items-center justify-center shadow-sm shadow-teal-900/20 ring-2 ring-white/20 flex-shrink-0"
             style={{ backgroundColor: '#f97316' }}
           >
-            <span className="text-white font-bold text-sm"><User2Icon /></span>
+            <span className="text-white font-bold text-sm"><User2Icon size={18}/></span>
           </div>
           <div className="hidden md:block text-left leading-tight">
             <p className="text-sm font-semibold truncate max-w-[110px] lg:max-w-[160px] text-gray-900">

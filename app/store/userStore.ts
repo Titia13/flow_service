@@ -1,17 +1,17 @@
 import { create } from "zustand"
 import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
-import { Role, User, UserInfo, UserLogin } from "../features/types/user";
+import { Role, Stats, User, UserInfo, UserLogin } from "../features/types/user";
 
 const Toast = Swal.mixin({
   toast: true,
   position: 'top-end',
   showConfirmButton: false,
   timer: 4000,
-  background: '#18181b',
-  color: '#ffffff',
+  background: '#ffffff',
+  color: '#6b7280',
   didOpen: (toast) => {
-    toast.style.border = '1px solid #27272a';
+    toast.style.border = '1px solid #ffffff';
   }
 });
 
@@ -30,6 +30,9 @@ interface UserStore {
   roles: Role,
   connectedUser: string | null,
   isAuthenticated: boolean,
+  statsUser: Stats,
+  statsApp: Stats,
+  statsTemplate: Stats,
   infoUser: UserInfo,
 
   getRoles: () => Promise<void>;
@@ -42,7 +45,9 @@ interface UserStore {
   confirmDelete: (id: User['_id']) => Promise<void>;
   UserLogin: (data: UserLogin) => Promise<void>;
   UserLogout: () => void;
+  stats: () => Promise<void>;
 }
+
 
 export const useUserStore = create<UserStore>((set, get) => ({
   users: [],
@@ -65,11 +70,28 @@ export const useUserStore = create<UserStore>((set, get) => ({
     role: ""
   },
   isAuthenticated: false,
+  statsUser: {
+    total: 0,
+    active: 0,
+    inactive: 0,
+    modifiedUsers: 0
+  },
+  statsApp: {
+    total: 0,
+    active: 0,
+    inactive: 0,
+    modifiedUsers: 0
+  },
+  statsTemplate: {
+    total: 0,
+    active: 0,
+    inactive: 0,
+    modifiedUsers: 0
+  },
 
   getRoles: async () => {
     try {
       const roles = await apiFetch("/users/roles");
-      console.log("roles", roles)
       set({
         roles
       });
@@ -96,7 +118,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
       const users = response.items || [];
       const totalUsers = response.total;
       const pageCount = response.pages;
-      console.log("response USERSS", response)
       set({
         users,
         totalUsers,
@@ -109,7 +130,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
       Toast.fire({ icon: 'error', title: message });
     }
   },
-
   listUsers: async () => {
     try {
       const response = await apiFetch("/users");
@@ -130,14 +150,12 @@ export const useUserStore = create<UserStore>((set, get) => ({
     }
     set({ isOpen: isOpen });
   },
-
   saveUser: async (userData) => {
     const { userToEdit, users } = get();
     try {
       if (userToEdit) {
         const id = userToEdit._id
         if (!id) {
-          console.error("ID manquant");
           return;
         }
         const mergedData = { ...userToEdit, ...userData };
@@ -183,9 +201,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
       Toast.fire({ icon: 'error', title: message });
     }
   },
-
   setUserToEdit: (user) => set({ userToEdit: user, isOpen: !!user }),
-
   confirmStatus: async (id: User['_id']) => {
     const { users } = get();
     if (!id) return;
@@ -231,7 +247,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
   },
 
   UserLogin: async (data: UserLogin) => {
-    const { users } = get();
     try {
       const response = await apiFetch("/users/login", {
         method: "POST",
@@ -242,7 +257,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
         return
       }
       const infoUser = response.user
-      console.log("UserLogin info", infoUser)
       set({
         isAuthenticated: true,
         loading: false,
@@ -265,4 +279,41 @@ export const useUserStore = create<UserStore>((set, get) => ({
     localStorage.removeItem('role');
     window.location.href = '/login';
   },
+
+  stats: async () => {
+    try {
+      const responseUser = await apiFetch("/users/stats", {
+        method: "GET",
+      });
+      const responseApp = await apiFetch("/app/stats", {
+        method: "GET",
+      });
+      const responseTemplate = await apiFetch("/templates/stats", {
+        method: "GET",
+      });
+      if (!responseUser.exists) {
+        Toast.fire({ icon: 'warning', title: responseUser.message });
+        return
+      }
+      const statsUser = responseUser.stats
+      const statsApp = responseApp.stats
+      const statsTemplate = responseTemplate.stats
+      set({
+        isAuthenticated: true,
+        loading: false,
+        statsApp,
+        statsUser,
+        statsTemplate
+      });
+      // Toast.fire({ icon: 'success', title: responseUser.message });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Mot de passe ou email incorrect';
+      set({
+        error: message, isAuthenticated: false,
+        loading: false,
+      });
+      Toast.fire({ icon: 'error', title: message });
+    }
+  },
+
 }));

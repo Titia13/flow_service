@@ -56,10 +56,10 @@ export function DialogForm() {
         form.reset({ filename: "", content: "", application_id: "" });
       }
     } else {
-    // je dois reset au moment de la fermeture aussi
-    form.reset({ filename: "", content: "", application_id: "" });
-  }
-  }, [templateToEdit,isOpen]);
+      // je dois reset au moment de la fermeture aussi
+      form.reset({ filename: "", content: "", application_id: "" });
+    }
+  }, [templateToEdit, isOpen]);
 
 
   return (
@@ -88,27 +88,28 @@ export function DialogForm() {
             name="application_id"
             children={(field) => {
               console.log("Valeur actuelle du champ :", field.state.value);
+
               return (
-              <Select
-                value={field.state.value ?? ""}
-                onValueChange={(value) => field.handleChange(value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionnez une application">
-                  {activeApps.find((app) => app._id === field.state.value)?.name}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {activeApps.map((app) => (
-                      <SelectItem key={app._id} value={app._id}>
-                        {app.name} ??
-                        {app._id === (field.state.value) ? " (Sélectionné)" : "" }
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>)
+                <Select
+                  value={field.state.value ?? ""}
+                  onValueChange={(value) => field.handleChange(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sélectionnez une application">
+                      {activeApps.find((app) => app._id === field.state.value)?.name}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {activeApps.map((app) => (
+                        <SelectItem key={app._id} value={app._id}>
+                          {app.name} ??
+                          {app._id === (field.state.value) ? " (Sélectionné)" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>)
             }}
           />
 
@@ -130,7 +131,7 @@ export function DialogForm() {
             name="content"
             children={(field: any) => (
               <Textarea
-              className="w-full break-all max-h-40 overflow-y-auto resize-none"
+                className="w-full break-all max-h-40 overflow-y-auto resize-none"
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 placeholder="Contenu"

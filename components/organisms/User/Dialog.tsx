@@ -140,7 +140,6 @@ export function DialogForm() {
           <form.Field
             name="role"
             children={(field) => {
-              console.log("Valeur actuelle du champ :", field.state.value);
               return (
                 <Select
                   value={field.state.value ?? ""}
