@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carte de Membre — Scouts Musulmans</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: 'Arial', sans-serif; }
+  .diag-stripe {
+    background: repeating-linear-gradient(
+      135deg,
+      #d97706 0px, #d97706 18px,
+      #ffffff 18px, #ffffff 22px,
+      #16a34a 22px, #16a34a 40px,
+      #ffffff 40px, #ffffff 44px
+    );
+  }
+  .barcode {
+    background: repeating-linear-gradient(90deg,#000 0 2px,transparent 2px 4px,#000 4px 5px,transparent 5px 8px);
+  }
+</style>
+</head>
+<body class="bg-neutral-900 min-h-screen flex items-center justify-center p-4 sm:p-10">
+
+<div class="flex flex-col gap-6 w-full max-w-xl">
+
+  <!-- ============ RECTO ============ -->
+  <div class="relative bg-white rounded-md shadow-2xl overflow-hidden border border-neutral-200">
+    <!-- bande diagonale décorative -->
+    <div class="diag-stripe absolute right-0 top-0 h-full w-24 sm:w-32 opacity-90"></div>
+
+    <div class="relative p-5 sm:p-7">
+      <!-- Header -->
+      <div class="flex justify-between items-start pr-16 sm:pr-24">
+        <div>
+          <p class="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">06-XXX-XXX-XX</p>
+          <p class="text-[10px] sm:text-xs text-neutral-500 tracking-widest uppercase">Matricule</p>
+        </div>
+        <div class="text-right">
+          <p class="text-lg sm:text-xl font-extrabold text-green-800 leading-tight">CARTE DE MEMBRE</p>
+          <p class="text-[10px] sm:text-xs text-neutral-500 uppercase tracking-wide">Scouts Musulmans de Côte d'Ivoire</p>
+        </div>
+      </div>
+
+      <!-- Corps -->
+      <div class="mt-6 flex gap-4 sm:gap-6 pr-16 sm:pr-24">
+        <!-- Photo -->
+        <div class="flex-shrink-0 flex flex-col items-center">
+          <!-- IMAGE: photo d'identité du membre -->
+          <img src="" alt="Photo du membre" class="w-24 h-28 sm:w-28 sm:h-32 object-cover border border-neutral-300 bg-neutral-100" />
+          <p class="mt-2 text-center text-[9px] sm:text-[10px] uppercase text-neutral-500 leading-tight">
+            Signature du<br/>Commissaire National
+          </p>
+          <!-- IMAGE: signature manuscrite -->
+          <img src="" alt="Signature" class="w-20 h-10 object-contain mt-1" />
+        </div>
+
+        <!-- Infos -->
+        <div class="flex-1 space-y-2.5">
+          <div>
+            <p class="text-[10px] uppercase text-neutral-400 italic">Prénoms</p>
+            <p class="text-sm sm:text-base font-bold text-neutral-900 -mt-0.5">PRÉNOM NOM</p>
+          </div>
+          <div>
+            <p class="text-[10px] uppercase text-neutral-400 italic">Nom</p>
+            <p class="text-sm sm:text-base font-bold text-neutral-900 -mt-0.5">NOM DE FAMILLE</p>
+          </div>
+          <div>
+            <p class="text-[10px] uppercase text-neutral-400 italic">Groupe</p>
+            <p class="text-sm sm:text-base font-bold text-neutral-900 -mt-0.5 leading-tight">NOM DU GROUPE</p>
+          </div>
+          <div>
+            <p class="text-[10px] uppercase text-neutral-400 italic">Fonction</p>
+            <p class="text-sm sm:text-base font-bold text-neutral-900 -mt-0.5 leading-tight">FONCTION OCCUPÉE</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sexe + logo + groupe sanguin -->
+      <div class="absolute top-24 right-4 sm:right-6 flex flex-col items-center gap-2 w-16 sm:w-20">
+        <p class="text-[10px] italic text-neutral-500 -mb-1">Sexe</p>
+        <p class="text-sm font-bold">—</p>
+        <!-- IMAGE: logo de l'association -->
+        <img src="" alt="Logo association" class="w-14 h-14 sm:w-16 sm:h-16 object-contain" />
+        <p class="text-sm sm:text-base font-extrabold text-neutral-800">GS: —</p>
+      </div>
+
+      <!-- Dates -->
+      <div class="mt-4 pr-16 sm:pr-24 text-right">
+        <p class="text-[10px] italic text-neutral-500">Délivrée le <span class="not-italic font-semibold text-neutral-700">JJ/MM/AAAA</span></p>
+        <p class="text-[10px] italic text-neutral-500">Expire le <span class="not-italic font-semibold text-neutral-700">JJ/MM/AAAA</span></p>
+      </div>
+
+      <!-- Code-barres / région -->
+      <div class="mt-4 flex items-center gap-3 border-t border-dashed border-neutral-300 pt-3">
+        <div class="barcode h-8 w-24 sm:w-28"></div>
+        <div class="flex-1 bg-black text-white text-center text-xs sm:text-sm font-bold py-1.5 tracking-widest uppercase">
+          Région — Zone
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ VERSO ============ -->
+  <div class="bg-neutral-50 rounded-md shadow-2xl overflow-hidden border border-neutral-200 relative">
+    <!-- filigrane -->
+    <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+      <!-- IMAGE: filigrane / emblème scout -->
+      <img src="" alt="" class="w-48 h-48 object-contain" />
+    </div>
+
+    <div class="relative p-6 sm:p-8 flex flex-col items-center text-center gap-3">
+      <!-- IMAGE: armoiries nationales -->
+      <img src="" alt="Armoiries" class="w-16 h-16 object-contain" />
+      <div>
+        <p class="text-sm sm:text-base font-bold text-neutral-800 tracking-wide">RÉPUBLIQUE DE CÔTE D'IVOIRE</p>
+      </div>
+      <p class="text-xs sm:text-sm font-semibold text-neutral-700 tracking-widest">UNION – DISCIPLINE – TRAVAIL</p>
+
+      <div class="w-full bg-purple-800 text-white text-xs sm:text-sm font-semibold py-2 px-3 mt-2 rounded-sm">
+        Organisation d'éducation à la citoyenneté et au service de la communauté
+      </div>
+
+      <p class="text-xs sm:text-sm text-neutral-600 mt-3 leading-relaxed">
+        Le détenteur de cette carte est membre des Scouts Musulmans de Côte d'Ivoire.
+      </p>
+      <p class="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+        Elle est établie pour identifier le détenteur.
+        <br class="hidden sm:block" />
+        <span class="font-semibold text-neutral-800">Toute autre utilisation n'implique pas la responsabilité de l'association.</span>
+      </p>
+    </div>
+
+    <div class="relative bg-purple-800 text-white text-center text-[11px] sm:text-xs py-3 px-4 leading-relaxed">
+      <span class="font-semibold">En cas de découverte de cette carte</span>, il est demandé à toute personne de bien vouloir
+      contacter le Commissariat National à l'Administration aux numéros suivants :
+      <br />
+      <span class="font-bold text-sm tracking-wide">+225 XX XX XX XX XX / XX XX XX XX XX</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

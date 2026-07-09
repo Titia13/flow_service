@@ -37,7 +37,7 @@ interface TemplateStore {
   setTemplateToEdit: (template: Template | null) => void;
   confirmStatus: (app_id: Template['_id']) => Promise<void>;
   confirmDelete: (id: Template['_id']) => Promise<void>;
-  uploadFile: (data: PdfTemplate) => Promise<void>;
+  uploadFile: (data: FileTemplate) => Promise<void>;
 }
 
 
@@ -214,31 +214,48 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
   uploadFile: async (data) => {
     try {
       set({ loading: true, error: null });
+      const payload: PdfTemplate = {
+        application_id: data.application_id._id, // Extraction de l'ID
+        filename: data.filename
+      };
       const response = await fetch(`${base_url}/templates/pdf`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.detail || `Erreur HTTP: ${response.status}`);
       }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
+      // const blob = await response.blob();
+      // const url = window.URL.createObjectURL(blob);
+      // const a = document.createElement("a");
+      // a.href = url;
 
-      // Récupérer le nom depuis le header Content-Disposition
+      // // Récupérer le nom depuis le header Content-Disposition
+      // const disposition = response.headers.get("Content-Disposition");
+      // const match = disposition?.match(/filename="(.+)"/);
+      // a.download = match?.[1] ?? `Document_${Date.now()}.pdf`;
+      // document.body.appendChild(a);
+      // a.click();
+      // a.remove();
+      // window.URL.revokeObjectURL(url);
+
+      const blob = await response.blob();
+
       const disposition = response.headers.get("Content-Disposition");
-      const match = disposition?.match(/filename="(.+)"/);
-      a.download = match?.[1] ?? `Document_${Date.now()}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
+      const match = disposition?.match(/filename="?(.+?)"?$/);
+      const filename = match?.[1] ?? `Document_${Date.now()}.pdf`;
+
+      const file = new File([blob], filename, { type: "application/pdf" });
+      const url = window.URL.createObjectURL(file);
+
+      window.open(url, "_blank");
+
+      setTimeout(() => window.URL.revokeObjectURL(url), 10_000);
 
       set({ result: "Super", loading: false });
     } catch (error) {

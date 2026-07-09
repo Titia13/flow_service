@@ -71,10 +71,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center">
-      {/* Section Hero */}
-      <section className="flex flex-col items-center justify-center gap-8 px-6 pt-32 pb-20 text-center max-w-4xl">
-        {/* Texte en gris très foncé pour une lisibilité parfaite sur fond clair */}
-        <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tighter">
+      <section className="flex flex-col items-center justify-center gap-8 px-6 pt-12 pb-20 text-center max-w-4xl">
+        <h1 className="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tighter">
           Simplifiez vos téléchargements de fichiers avec <span className="text-orange-500">FLOW</span>
         </h1>
         
@@ -82,7 +80,6 @@ export default function Home() {
           Centralisez vos ressources, accélérez vos téléchargements et gérez vos templates en un seul endroit. L'outil conçu pour votre productivité.
         </p>
 
-        {/* Stats - Version Light & Soft pour fond clair */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 w-full">
           {data.map((stat, i) => (
             <div 
@@ -95,14 +92,12 @@ export default function Home() {
           ))}
         </div>
       </section>
-
-      {/* Section Action */}
       <section className="px-6 py-10">
         <Link
           href="/application"
           className="group inline-flex items-center gap-3 text-slate-700 text-lg font-medium bg-slate-100 hover:bg-orange-500 hover:text-white px-8 py-4 rounded-full transition-all duration-300"
         >
-          C&apos;est parti !!
+          C&apos;est parti !!!
           <span className="group-hover:translate-x-1 transition-transform">→</span>
         </Link>
       </section>

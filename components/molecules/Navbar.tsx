@@ -22,7 +22,7 @@ export default function Navbar() {
     { name: 'Dashboard', href: '/home' },
     { name: 'Applications', href: '/application' },
     { name: 'Templates', href: '/template' },
-    { name: 'Fichiers', href: '/file' },
+    // { name: 'Fichiers', href: '/file' },
     { name: 'Utilisateurs', href: '/user' },
   ];
 

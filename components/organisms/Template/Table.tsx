@@ -10,8 +10,8 @@ interface Props {
 }
 
 export default function Table({ searchQuery }: Props) {
-  const { templates, fetchTemplates, pageCount, currentPage, itemsPerPage, loading, setTemplateToEdit, confirmDelete, confirmStatus } = useTemplateStore();
-  const columns = useMemo(() => getColumns(setTemplateToEdit, confirmDelete, confirmStatus), [confirmDelete, confirmStatus]);
+  const { uploadFile, templates, fetchTemplates, pageCount, currentPage, itemsPerPage, loading, setTemplateToEdit, confirmDelete, confirmStatus } = useTemplateStore();
+  const columns = useMemo(() => getColumns(setTemplateToEdit, confirmDelete, confirmStatus, uploadFile), [confirmDelete, confirmStatus, uploadFile]);
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: currentPage - 1,
