@@ -88,7 +88,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       const templates = response.items || [];
       const activeTemplates = templates.filter((i: { is_active: boolean; }) => i.is_active === true);
       set({
-        activeTemplates
+        activeTemplates: activeTemplates as FileTemplate[]
       });
     } catch (error) {
       const message = 'Erreur lors du chargement';
@@ -215,7 +215,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
     try {
       set({ loading: true, error: null });
       const payload: PdfTemplate = {
-        application_id: data.application_id._id, // Extraction de l'ID
+        application_id: data.application_id._id, 
         filename: data.filename
       };
       const response = await fetch(`${base_url}/templates/pdf`, {

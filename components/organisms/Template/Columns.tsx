@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { DeleteAlert } from "@/components/atoms/DeleteAlert"
-import { FileTemplate, Template } from "@/app/features/types/template"
+import { FileTemplate, PdfTemplate, Template } from "@/app/features/types/template"
 import { StatusAlert } from "./StatusAlert"
 import Link from "next/link"
 
@@ -98,7 +98,7 @@ export const getColumns = (
         const dataUpload = {
           filename: data.filename,
           application_id: data.application_id,
-        }
+        } as PdfTemplate
         console.log("dataUpload====", dataUpload)
 
         return (
@@ -125,7 +125,7 @@ export const getColumns = (
                   onClick={() => uploadFile(dataUpload)}
                 >
                   <Eye className="w-4 h-4 text-zinc-600" />
-                  <span>Previous</span>
+                  <span>Aperçu</span>
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
