@@ -103,8 +103,9 @@ export function DialogForm() {
                     <SelectGroup>
                       {activeApps.map((app) => (
                         <SelectItem key={app._id} value={app._id}>
-                          {app.name} ??
-                          {app._id === (field.state.value) ? " (Sélectionné)" : ""}
+                          {app.name} 
+                          {/* ??
+                          {app._id === (field.state.value) ? " (Sélectionné)" : ""} */}
                         </SelectItem>
                       ))}
                     </SelectGroup>

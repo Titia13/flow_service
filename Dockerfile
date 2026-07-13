@@ -1,6 +1,6 @@
 # 1. Étape de dépendances
-FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat
+FROM node:20-slim AS deps
+# RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci 
@@ -8,15 +8,18 @@ RUN npm ci
 
 
 # 2. Étape de construction (build)
-FROM node:20-alpine AS builder
-RUN apk add --no-cache libc6-compat
+FROM node:20-slim AS builder
+# RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Install platform-specific dependencies
+RUN npm install --platform=linux --arch=x64 lightningcss
+RUN npm rebuild lightningcss
 RUN npm run build
 
 # 3. Étape de production finale
-FROM node:20-alpine AS runner
+FROM node:20-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
