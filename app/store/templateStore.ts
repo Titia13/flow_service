@@ -2,6 +2,7 @@ import { create } from "zustand"
 import { Template, FileTemplate, PdfTemplate } from "../features/types/template";
 import Swal from "sweetalert2"
 import { apiFetch, base_url } from "../features/api/api";
+import { metadata } from "../layout";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -28,6 +29,7 @@ interface TemplateStore {
   searchQuery: string;
   activeTemplates: FileTemplate[],
   result: string | null;
+  loadingId: string | null;
 
   fetchTemplates: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
   listTemplates: () => Promise<void>;
@@ -37,7 +39,8 @@ interface TemplateStore {
   setTemplateToEdit: (template: Template | null) => void;
   confirmStatus: (app_id: Template['_id']) => Promise<void>;
   confirmDelete: (id: Template['_id']) => Promise<void>;
-  uploadFile: (data: FileTemplate) => Promise<void>;
+  dynamicUploadFile: (data: FileTemplate, id: string) => Promise<void>;
+  uploadFile: (data: FileTemplate, id: string) => Promise<void>;
 }
 
 
@@ -54,6 +57,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
   activeTemplates: [],
   searchQuery: "",
   result: "",
+  loadingId:null,
   fetchTemplates: async (currentPage, itemsPerPage, searchQuery) => {
     try {
       set({ loading: true, error: null });
@@ -211,14 +215,16 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
     }
   },
 
-  uploadFile: async (data) => {
+  dynamicUploadFile: async (data) => {
     try {
       set({ loading: true, error: null });
       const payload: PdfTemplate = {
         application_id: data.application_id._id, 
-        filename: data.filename
+        filename: data.filename,
+        metadata: data.filename
       };
-      const response = await fetch(`${base_url}/templates/pdf`, {
+      const response = await fetch(`${base_url}/templates/pdf/generate/${data.application_id}/${data.filename}`, {
+        // http://localhost:8000/templates/pdf/generate/6a317843afcaf3ebc942d239/test%202%20horus
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -229,30 +235,12 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.detail || `Erreur HTTP: ${response.status}`);
       }
-
-      // const blob = await response.blob();
-      // const url = window.URL.createObjectURL(blob);
-      // const a = document.createElement("a");
-      // a.href = url;
-
-      // // Récupérer le nom depuis le header Content-Disposition
-      // const disposition = response.headers.get("Content-Disposition");
-      // const match = disposition?.match(/filename="(.+)"/);
-      // a.download = match?.[1] ?? `Document_${Date.now()}.pdf`;
-      // document.body.appendChild(a);
-      // a.click();
-      // a.remove();
-      // window.URL.revokeObjectURL(url);
-
       const blob = await response.blob();
-
       const disposition = response.headers.get("Content-Disposition");
       const match = disposition?.match(/filename="?(.+?)"?$/);
       const filename = match?.[1] ?? `Document_${Date.now()}.pdf`;
-
       const file = new File([blob], filename, { type: "application/pdf" });
       const url = window.URL.createObjectURL(file);
-
       window.open(url, "_blank");
 
       setTimeout(() => window.URL.revokeObjectURL(url), 10_000);
@@ -264,6 +252,46 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       Toast.fire({ icon: "error", title: message });
     }
   },
+
+  uploadFile: async (data, id) => {
+  set({error: null, loadingId: id });
+  try {
+    const payload: PdfTemplate = {
+      application_id: data.application_id._id, 
+      filename: data.filename
+    };
+    
+    const response = await fetch(`${base_url}/templates/pdf`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || `Erreur HTTP: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const disposition = response.headers.get("Content-Disposition");
+    const match = disposition?.match(/filename="?(.+?)"?$/);
+    const filename = match?.[1] ?? `Document_${Date.now()}.pdf`;
+    const file = new File([blob], filename, { type: "application/pdf" });
+    const url = window.URL.createObjectURL(file);
+    window.open(url, "_blank");
+
+    setTimeout(() => window.URL.revokeObjectURL(url), 10_000);
+    set({ result: "Super", loadingId: null });
+
+  } catch (error) {
+    const message = "Une erreur est survenue ou le contenu du template est invalide";
+    set({ error: message, loadingId: null });
+    Toast.fire({ icon: "error", title: message });
+  } finally {
+    // Le 'finally' s'exécute quoi qu'il arrive
+    set({ loadingId: null });
+  }
+},
 
 }));
 

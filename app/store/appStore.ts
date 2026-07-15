@@ -14,6 +14,8 @@ interface AppStore {
   itemsPerPage: number;
   currentPage: number;
   activeApps:Application[];
+  isUpdating: boolean;
+
 
   fetchApps: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
   listApps: () => Promise<void>;
@@ -49,7 +51,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   currentPage: 1,
   searchQuery: "",
   activeApps:[],
-
+  isUpdating: false,
   fetchApps: async (currentPage, itemsPerPage, searchQuery) => {
     try {
       set({ loading: true, error: null });
@@ -96,7 +98,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   saveApp: async (appData) => {
-    const { appToEdit, apps } = get();
+    const { appToEdit, apps, isUpdating } = get();
     try {
       if (appToEdit) {
         const id = appToEdit._id
@@ -118,6 +120,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         set({
           apps: apps.map((u) => (u._id === id ? updatedData : u)),
           isOpen: false,
+          isUpdating: false,
           appToEdit: null,
         });
         Toast.fire({ icon: 'success', title: response.message || 'Application modifiée avec succès' });

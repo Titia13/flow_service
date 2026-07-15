@@ -21,10 +21,12 @@ export function AppDialogForm() {
   const appToEdit = useAppStore((state) => state.appToEdit);
   const isOpen = useAppStore((state) => state.isOpen);
   const setIsOpen = useAppStore((state) => state.setIsOpen);
+  const isUpdating = useAppStore((state) => state.isUpdating);
+
 
   // const [open, setOpen] = useState(false)
   const form = useForm({
-    defaultValues: { name: "", description: "", is_active: true },
+    defaultValues: { name: "", description: "", is_active: true, code: ""  },
     onSubmit: async ({ value}) => {
       await saveApp(value)
       setIsOpen(false) 
@@ -36,6 +38,7 @@ export function AppDialogForm() {
       if (appToEdit) {
         // Si on modifie, on injecte les valeurs de l'application sélectionnée
         form.reset({
+          code: appToEdit.code || "",
           name: appToEdit.name || "",
           description: appToEdit.description || "",
           is_active: appToEdit.is_active ?? true,
@@ -69,6 +72,36 @@ export function AppDialogForm() {
           }}
           className="flex flex-col gap-4"
         >
+          {appToEdit ? <form.Field
+            name="code"
+            children={(field:any) => (
+              <input
+                className="w-full border border-input rounded-md px-3 py-2"
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Code"
+                type="text"
+                maxLength={30}
+                required 
+                disabled
+              />
+            )}
+          /> : <form.Field
+            name="code"
+            children={(field:any) => (
+              <input
+                className="w-full border border-input rounded-md px-3 py-2 bg-gray-500"
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Code"
+                type="text"
+                title="Impossible de modifier"
+                maxLength={30}
+                required 
+              />
+            )}
+          />}
+          
           <form.Field
             name="name"
             children={(field:any) => (

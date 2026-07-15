@@ -36,6 +36,10 @@ export const getColumns = (
       header: "Description",
     },
     {
+      accessorKey: "code",
+      header: "Code",
+    },
+    {
       accessorKey: "is_active",
       header: "Statut",
       // cell: ({ row }) => (row.original.is_active ? "Active" : "Inactive"),

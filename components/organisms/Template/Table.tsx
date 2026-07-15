@@ -11,8 +11,16 @@ interface Props {
 
 export default function Table({ searchQuery }: Props) {
   const { uploadFile, templates, fetchTemplates, pageCount, currentPage, itemsPerPage, loading, setTemplateToEdit, confirmDelete, confirmStatus } = useTemplateStore();
-  const columns = useMemo(() => getColumns(setTemplateToEdit, confirmDelete, confirmStatus, uploadFile), [confirmDelete, confirmStatus, uploadFile]);
-
+  // const columns = useMemo(() => getColumns(setTemplateToEdit, confirmDelete, confirmStatus, uploadFile), [confirmDelete, confirmStatus, uploadFile]);
+const columns = useMemo(() => 
+  getColumns(
+    setTemplateToEdit, 
+    confirmDelete, 
+    confirmStatus, 
+    (data, id) => uploadFile(data, id) // Appel correct avec les deux arguments
+  ), 
+  [confirmDelete, confirmStatus, uploadFile]
+);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: currentPage - 1,
     pageSize: itemsPerPage,

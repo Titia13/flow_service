@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import {
   Eye,
+  Loader2,
   MoreHorizontal,
   Pencil,
   Upload,
@@ -20,13 +21,15 @@ import { DeleteAlert } from "@/components/atoms/DeleteAlert"
 import { FileTemplate, PdfTemplate, Template } from "@/app/features/types/template"
 import { StatusAlert } from "./StatusAlert"
 import Link from "next/link"
+import { useTemplateStore } from "@/app/store/templateStore"
+import { Loader } from "@/components/atoms/Loader"
 
 
 export const getColumns = (
   setTemplateToEdit: (temp: Template) => void,
   confirmDelete: (id: Template['_id']) => Promise<void>,
   confirmStatus: (id: Template['_id']) => Promise<void>,
-  uploadFile: (data: FileTemplate) => Promise<void>
+  uploadFile: (data: FileTemplate, id: string) => Promise<void>
 ): ColumnDef<Template>[] => [
     {
       accessorKey: "filename",
@@ -94,6 +97,9 @@ export const getColumns = (
       cell: ({ row }) => {
         const data = row.original
         const inactiveTemp = row.original.is_active
+        const { loadingId } = useTemplateStore();
+        const isRowLoading = loadingId === data._id;
+
         console.log("data====", data)
         const dataUpload = {
           filename: data.filename,
@@ -122,12 +128,26 @@ export const getColumns = (
               {inactiveTemp && (
                 <DropdownMenuItem
                   className="text-zinc-600 cursor-pointer"
-                  onClick={() => uploadFile(dataUpload)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    uploadFile(dataUpload, data._id);
+                  }}
                 >
-                  <Eye className="w-4 h-4 text-zinc-600" />
-                  <span>Aperçu</span>
+                  {isRowLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      En cours...
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="w-4 h-4 text-zinc-600" />
+                      Aperçu
+                    </>
+                  )}
                 </DropdownMenuItem>
               )}
+
+
               <DropdownMenuSeparator />
               <DeleteAlert
                 name={data.filename}
