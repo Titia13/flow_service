@@ -18,18 +18,20 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { DeleteAlert } from "@/components/atoms/DeleteAlert"
-import { FileTemplate, PdfTemplate, Template } from "@/app/features/types/template"
+import { FileTemplate, PayloadPdf, PdfTemplate, Template } from "@/app/features/types/template"
 import { StatusAlert } from "./StatusAlert"
 import Link from "next/link"
 import { useTemplateStore } from "@/app/store/templateStore"
 import { Loader } from "@/components/atoms/Loader"
+import { extractAppCode, extractAppId } from "@/lib/utils"
 
 
 export const getColumns = (
   setTemplateToEdit: (temp: Template) => void,
   confirmDelete: (id: Template['_id']) => Promise<void>,
   confirmStatus: (id: Template['_id']) => Promise<void>,
-  uploadFile: (data: FileTemplate, id: string) => Promise<void>
+  uploadFile: (data: PdfTemplate, id: string) => Promise<void>,
+  dynamicFileUpload: (data: PayloadPdf, id: string) => Promise<void>,
 ): ColumnDef<Template>[] => [
     {
       accessorKey: "filename",
@@ -98,15 +100,74 @@ export const getColumns = (
         const data = row.original
         const inactiveTemp = row.original.is_active
         const { loadingId } = useTemplateStore();
-        const isRowLoading = loadingId === data._id;
-
-        console.log("data====", data)
-        const dataUpload = {
+        const rowId = loadingId === data._id;
+        const payload = {
+          application_id: extractAppId(data.application_id) || "",
           filename: data.filename,
-          application_id: data.application_id,
-        } as PdfTemplate
-        console.log("dataUpload====", dataUpload)
-
+          app_code: extractAppCode(data.application_id) || "",
+          meta_data: {
+            visite: {
+              reference: "VIS-2026-001",
+              statut: "Terminé",
+              dateDebut: "2026-07-13T09:00:00Z",
+              dateFin: "2026-07-13T17:00:00Z",
+              entite: {
+                libelle: "Usine A",
+                typeNiveau: "Site Industriel"
+              },
+              typeVisite: {
+                libelle: "Sécurité"
+              },
+              equipe: [
+                {
+                  matricule: "M123",
+                  prenom: "Jean",
+                  nom: "Dupont",
+                  habilitation: "Niveau 1",
+                  isResponsable: true
+                }
+              ],
+              reglesSecurites: [
+                {
+                  code: "S1",
+                  libelle: "Port du casque obligatoire"
+                }
+              ]
+            },
+            responsableEquipe: {
+              prenom: "Marie",
+              nom: "Martin"
+            },
+            responsableVHS: {
+              firstname: "Pierre",
+              lastname: "Durand"
+            },
+            kpi: {
+              totalObservations: 5
+            },
+            generatedAt: "2026-07-13T10:00:00Z",
+            sectionsAvecObservations: [
+              {
+                libelle: "Zone de stockage",
+                observations: [
+                  {
+                    refLexique: {
+                      code: "OBS-001"
+                    },
+                    constat: "Cheminement obstrué",
+                    localisation: "Allée 4",
+                    recommandations: [
+                      {
+                        description: "Dégager l'allée immédiatement"
+                      }
+                    ],
+                    preuves: []
+                  }
+                ]
+              }
+            ]
+          }
+        }
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -125,15 +186,37 @@ export const getColumns = (
                 title="Confirmer le changement de statut"
                 onConfirm={() => confirmStatus(data._id)}
               />
+              {/* {inactiveTemp && (
+                <DropdownMenuItem
+                  className="text-zinc-600 cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    uploadFile(dataUpload, data._id!);
+                  }}
+                >
+                  {isRowLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      En cours...
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="w-4 h-4 text-zinc-600" />
+                      Aperçu 1
+                    </>
+                  )}
+                </DropdownMenuItem>
+              )} */}
+              {/* testt avec dynamicFileUpload */}
               {inactiveTemp && (
                 <DropdownMenuItem
                   className="text-zinc-600 cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    uploadFile(dataUpload, data._id);
+                    dynamicFileUpload(payload, data._id!);
                   }}
                 >
-                  {isRowLoading ? (
+                  {rowId ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       En cours...
@@ -146,8 +229,6 @@ export const getColumns = (
                   )}
                 </DropdownMenuItem>
               )}
-
-
               <DropdownMenuSeparator />
               <DeleteAlert
                 name={data.filename}

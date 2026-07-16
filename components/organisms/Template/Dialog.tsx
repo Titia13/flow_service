@@ -23,6 +23,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { useTemplateStore } from "@/app/store/templateStore"
 import { useAppStore } from "@/app/store/appStore";
 import { Plus } from "lucide-react";
+import { App } from "@/app/features/types/template";
+import { extractAppId } from "@/lib/utils";
 
 
 export function DialogForm() {
@@ -50,7 +52,7 @@ export function DialogForm() {
         form.reset({
           filename: templateToEdit.filename || "",
           content: templateToEdit.content || "",
-          application_id: templateToEdit?.application_id || "",
+         application_id: extractAppId(templateToEdit.application_id) || "",
         });
       } else {
         form.reset({ filename: "", content: "", application_id: "" });
@@ -87,8 +89,6 @@ export function DialogForm() {
           <form.Field
             name="application_id"
             children={(field) => {
-              console.log("Valeur actuelle du champ :", field.state.value);
-
               return (
                 <Select
                   value={field.state.value ?? ""}

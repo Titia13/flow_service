@@ -8,7 +8,7 @@ export default function Templates() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  useEffect(() => { //pour la recherche
+  useEffect(() => { 
     const timeout = setTimeout(() => {
       setDebouncedSearch(searchQuery);
     }, 200);
@@ -22,7 +22,7 @@ export default function Templates() {
         <div className="mb-8 flex items-center justify-start">
           <h1 className="text-xl font-semibold">Gestion des templates</h1>
         </div>
-        <div className="container mx-auto flex items-center gap-4" style={{ marginBottom: '-3rem' }}>
+        <div className="container mx-auto flex items-center gap-4" style={{ backgroundColor: '-3rem' }}>
           <Input
             placeholder="Rechercher ..."
             className="w-full max-w-6xl"

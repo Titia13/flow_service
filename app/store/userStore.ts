@@ -1,19 +1,8 @@
 import { create } from "zustand"
-import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
 import { Role, Stats, User, UserInfo, UserLogin } from "../features/types/user";
+import { Toast } from "@/lib/utils";
 
-const Toast = Swal.mixin({
-  toast: true,
-  position: 'top-end',
-  showConfirmButton: false,
-  timer: 4000,
-  background: '#ffffff',
-  color: '#6b7280',
-  didOpen: (toast) => {
-    toast.style.border = '1px solid #ffffff';
-  }
-});
 
 interface UserStore {
   users: User[];

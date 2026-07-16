@@ -1,7 +1,7 @@
 export interface FileTemplate {
     id?: string;
     _id: string;
-    application_id: App ;
+    application_id: App | string;
     filename?: string;
     type?: string;
     engine?: string;
@@ -13,15 +13,16 @@ export interface FileTemplate {
     updated_at?: Date;
 }
 export interface App {
-    _id: string;
+    _id?: string;
     id?: string;
     name?: string;
+    code?: string;
 }
 
 export interface Template {
     id?: string;
     _id?: string;
-    application_id?: string ;
+    application_id?: App | string;
     filename?: string;
     name?: string;
     type?: string;
@@ -34,13 +35,21 @@ export interface Template {
     updated_at?: Date;
 }
 
-export interface PdfTemplate{
+export interface PayloadPdf{
     _id?: string;
+    id?: string;
+    application_id: App | string; 
+    filename?: string;
+    app_code: string;
+    meta_data?: Record<string, any> | null;
+}
+
+export interface PdfTemplate{
+    // _id: string;
+    // application_id: App | string;
     application_id: string;
     filename?: string;
     meta_data?: Record<string, any> | null;
 }
-export interface MetaData{
-    application_id?: string;
-    filename?: string;
-}
+
+//  polymorphe

@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import { Application } from "../features/types/app";
-import Swal from "sweetalert2"
 import { apiFetch } from "../features/api/api";
+import { Toast } from "@/lib/utils";
 
 interface AppStore {
   apps: Application[];
@@ -14,7 +14,6 @@ interface AppStore {
   itemsPerPage: number;
   currentPage: number;
   activeApps:Application[];
-  isUpdating: boolean;
 
 
   fetchApps: (page?: number, size?: number, searchQuery?: string) => Promise<void>;
@@ -27,17 +26,6 @@ interface AppStore {
   confirmDelete: (app_id: Application['_id']) => Promise<void>; 
 }
 
-const Toast = Swal.mixin({
-  toast: true,
-  position: 'top-end',
-  showConfirmButton: false,
-  timer: 4000,
-  background: '#18181b',
-  color: '#ffffff',
-  didOpen: (toast) => {
-    toast.style.border = '1px solid #27272a';
-  }
-});
 
 export const useAppStore = create<AppStore>((set, get) => ({
   apps: [],
@@ -51,7 +39,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
   currentPage: 1,
   searchQuery: "",
   activeApps:[],
-  isUpdating: false,
+
   fetchApps: async (currentPage, itemsPerPage, searchQuery) => {
     try {
       set({ loading: true, error: null });
@@ -98,12 +86,11 @@ export const useAppStore = create<AppStore>((set, get) => ({
   },
 
   saveApp: async (appData) => {
-    const { appToEdit, apps, isUpdating } = get();
+    const { appToEdit, apps } = get();
     try {
       if (appToEdit) {
         const id = appToEdit._id
         if (!id) {
-          console.error("ID manquant");
           return;
         }
         const mergedData = { ...appToEdit, ...appData };
@@ -120,7 +107,6 @@ export const useAppStore = create<AppStore>((set, get) => ({
         set({
           apps: apps.map((u) => (u._id === id ? updatedData : u)),
           isOpen: false,
-          isUpdating: false,
           appToEdit: null,
         });
         Toast.fire({ icon: 'success', title: response.message || 'Application modifiée avec succès' });

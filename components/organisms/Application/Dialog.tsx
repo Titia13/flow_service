@@ -21,7 +21,6 @@ export function AppDialogForm() {
   const appToEdit = useAppStore((state) => state.appToEdit);
   const isOpen = useAppStore((state) => state.isOpen);
   const setIsOpen = useAppStore((state) => state.setIsOpen);
-  const isUpdating = useAppStore((state) => state.isUpdating);
 
 
   // const [open, setOpen] = useState(false)
