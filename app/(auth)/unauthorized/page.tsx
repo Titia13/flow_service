@@ -25,7 +25,7 @@ export default function UnauthorizedPage() {
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <Link
           href="/home"
-          className="group inline-flex items-center gap-3 text-slate-700 text-md font-medium bg-slate-200 hover:bg-slate-800 hover:text-white px-6 py-2 rounded-xl transition-all duration-300"
+          className="group inline-flex items-center gap-3 text-slate-700 text-md font-medium bg-slate-200 hover:bg-slate-800 hover:text-white px-6 py-2 rounded-md transition-all duration-300"
         ><span className="group-hover:-translate-x-1 transition-transform">←</span>
           Retour au tableau de bord
         </Link>
