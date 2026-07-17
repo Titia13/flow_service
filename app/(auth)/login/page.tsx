@@ -56,7 +56,6 @@ function LoginForm() {
                 }}
                 className="flex flex-col gap-4"
               >
-                {/* Email */}
                 <form.Field
                   name="email"
                   children={(field) => (
@@ -74,8 +73,6 @@ function LoginForm() {
                     </div>
                   )}
                 />
-
-                {/* Password */}
                 <form.Field
                   name="password"
                   children={(field) => (

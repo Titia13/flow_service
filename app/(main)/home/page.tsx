@@ -4,6 +4,7 @@ import { ChartPieLabel } from "@/components/molecules/ChartPie";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
+import pana from "@/public/pana.svg";
 
 // export default function Home() {
 //   const { statsUser, statsApp, statsTemplate, stats } = useUserStore();
@@ -70,6 +71,14 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center">
+      <Image
+          src={pana}
+          alt="panahome"
+          width={320}
+          height={320}
+          className="absolute top-58 left-2 object-contain opacity-[0.25] rotate-[-3deg] pointer-events-none select-none"
+        />
+
       <section className="flex flex-col items-center justify-center gap-8 px-6 pt-12 pb-20 text-center max-w-4xl">
         <h1 className="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tighter">
           Simplifiez vos téléchargements de fichiers avec <span className="text-orange-500">FLOW</span>
