@@ -2,6 +2,7 @@ import { create } from "zustand"
 import { Template, FileTemplate, PdfTemplate, PayloadPdf } from "../features/types/template";
 import { apiFetch, base_url } from "../features/api/api";
 import { extractAppId, Toast } from "@/lib/utils";
+import test from "node:test";
 
 
 interface TemplateStore {
@@ -61,6 +62,8 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       if (searchQuery) params.set("filename", searchQuery);
       const response = await apiFetch(`/templates?${params.toString()}`);
       const templates = response.items || [];
+        console.log("get templates", templates)
+
       const totalTemplates = response.total;
       const pageCount = response.pages;
       const activeTemplates = templates.filter((i: { is_active: boolean; }) => i.is_active === true);
@@ -108,9 +111,10 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
         if (!id) {
           return;
         }
-        const mergedData = { ...templateToEdit, ...templateData };
+        const mergedData = { ...templateToEdit, ...templateData  };
 
         const { id: _, _id: __, created_at, updated_at, is_active, is_deleted, version, engine, type, ...cleanData } = mergedData;
+      
         const body = {
           filename: templateData.filename || templateToEdit.filename,
           content: templateData.content || templateToEdit.content,
@@ -137,6 +141,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
           method: "POST",
           body: JSON.stringify(templateData),
         });
+        console.log("ajoutt response", response)
         if (!response.exists) {
           Toast.fire({ icon: 'warning', title: response.message });
           return
@@ -295,13 +300,6 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
   },
 
 }));
-
-
-
-
-
-
-
 
 
 
